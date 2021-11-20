@@ -1,0 +1,32 @@
+# Think of modeling
+
+## get data
+- users
+    - id
+    - name
+    - email
+    - img
+
+- workspaces
+    - id
+
+- channels
+    - id
+
+- messages
+    - id
+    - userid
+    - channelid
+    - content
+    - create
+    - update
+    - delete
+
+- shreadmessages
+    - id
+    - userid
+    - messageid
+    - content
+    - create
+    - update
+    - delete
