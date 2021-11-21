@@ -5,7 +5,15 @@
     - id
     - name
     - email
+    - content
     - img
+
+# users:workspaces = N:N
+# need to create table...
+- user_detail
+    - user_id
+    - can_edit
+    - workspace_id
 
 - workspaces
     - id
@@ -15,18 +23,30 @@
 
 - messages
     - id
-    - userid
-    - channelid
+    - user_id
+    - channel_id
     - content
     - create
     - update
     - delete
 
-- shreadmessages
-    - id
-    - userid
-    - messageid
-    - content
-    - create
-    - update
-    - delete
+# 非正規化のパターン
+# - messages
+#     - id
+#     - userid
+#     - channelid
+#     - parentid
+#     - content
+#     - create
+#     - update
+#     - delete
+
+# 不要だと気づいた
+# - shreadmessages
+#     - id
+#     - userid
+#     - messageid
+#     - content
+#     - create
+#     - update
+#     - delete
