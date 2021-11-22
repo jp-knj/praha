@@ -1,0 +1,62 @@
+@startuml
+' hide the spot
+hide circle
+
+'avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "users" as users {
+  +id : number
+  name: text
+  email: text
+  content: text
+  img : text
+}
+
+entity user_workspace as "user_workspace" {
+  +id: number
+  role: text
+  --
+  #user_id : number
+  #workspace_id : number
+}
+
+entity "workspaces" as workspaces {
+  +id : number
+  --
+  #user_workspace : number
+}
+
+entity "user_channel" as user_channel{
+  +id: number
+  role: text
+  --
+  #channel_id: number
+  #user_id:number
+}
+
+entity "channels" as channels {
+  +id : number
+  --
+  #user_channel_id: number
+  #workspace_id: number
+}
+
+entity "messages" as messages {
+  id : number
+  message_id: number
+  img: text
+  create_at : date
+  updated_at: date
+  is_deleted: boolean
+  --
+  #channel_id:number
+}
+
+users ||..o{ user_workspace
+user_workspace |o..o{ workspaces
+workspaces |o..o{ channels
+users|o..o{ user_channel
+user_channel|o..o{ channels
+channels |o..o{ messages
+@enduml
