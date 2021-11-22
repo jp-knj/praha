@@ -43,7 +43,7 @@ entity "channels" as channels {
 }
 
 entity "messages" as messages {
-  id : number
+  +id : number
   message_id: number
   img: text
   create_at : date

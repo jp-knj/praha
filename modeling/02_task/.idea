@@ -75,3 +75,6 @@
 - 中間テーブル(user_channel)が列が存在すると、チャンネルにユーザの存在表明できる
 
 - フレームワークから独立したDBにしないことがいいこともある
+
+▼ 参考にしたURL
+https://sparxsystems.com/resources/tutorials/uml/datamodel.html
