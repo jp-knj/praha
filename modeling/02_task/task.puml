@@ -42,6 +42,12 @@ entity "channels" as channels {
   #workspace_id: number
 }
 
+entity "unread_messages" as unread_messages {
+  +id : number
+  --
+  #message_id:number
+}
+
 entity "messages" as messages {
   +id : number
   message_id: number
@@ -54,9 +60,11 @@ entity "messages" as messages {
 }
 
 users ||..o{ user_workspace
+users ||..o{ unread_messages
 user_workspace |o..o{ workspaces
 workspaces |o..o{ channels
 users|o..o{ user_channel
 user_channel|o..o{ channels
 channels |o..o{ messages
+unread_messages |o..o| messages
 @enduml
