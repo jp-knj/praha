@@ -6,14 +6,14 @@ hide circle
 skinparam linetype ortho
 
 entity "users" as users {
-  +id : number,
-  user_name: text,
+  +id : number
+  name: text
   email: text
 }
 
 entity "projects" as projects {
   +id : number,
-  project_name: text,
+  name: text,
   content: text,
   --
   user_id: text
@@ -21,14 +21,15 @@ entity "projects" as projects {
 
 entity "user_project" as user_project {
   +id : number,
-  username: text,
   user_role: text,
-  email: text
+  --
+  #user_id: number,
+  #project_id: number,
 }
 
 entity "user_directory" as user_directory {
   +id : number
-  role: text
+  user_role: text
   --
   #user_id : number
   #directory_id : number
@@ -36,38 +37,41 @@ entity "user_directory" as user_directory {
 
 entity "directories" as directories {
   +id : number
-  project_id: number
-  user_id: number
   author_name: text
   directory_name: text
   content: text
   edited_date: date
   --
-  #user_id : number
+  #project_id: number
   #user_directory_id
 }
 
 entity "directory_path" as directory_path {
   +id:number,
-  ancestor_id: number,
-  descendant_id: number,
+  --
+  #parent_directory_id: number,
+  #child_directory_id: number,
 }
 
 entity "documents" as documents {
   +id : number
-  username: text
-  email: text
+  content: text
+  --
+  #user_id: number
+  #directory_id: number
 }
 
 entity "document_histories" as document_histories {
   +id : number
+  user_id: number
   previous_content: text
-  after_content: text
-  email: text
+  edited_content: text
+  edited_date
 }
 
-users ||..o{ user_directory
 users ||..o{ user_project
+users ||..o{ user_directory
+users ||..o{ documents
 user_project ||..o{ projects
 user_directory ||..o{ directories
 projects ||..o{ directories
