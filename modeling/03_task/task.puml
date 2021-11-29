@@ -1,0 +1,77 @@
+@startuml
+' hide the spot
+hide circle
+
+'avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "users" as users {
+  +id : number,
+  user_name: text,
+  email: text
+}
+
+entity "projects" as projects {
+  +id : number,
+  project_name: text,
+  content: text,
+  --
+  user_id: text
+}
+
+entity "user_project" as user_project {
+  +id : number,
+  username: text,
+  user_role: text,
+  email: text
+}
+
+entity "user_directory" as user_directory {
+  +id : number
+  role: text
+  --
+  #user_id : number
+  #directory_id : number
+}
+
+entity "directories" as directories {
+  +id : number
+  project_id: number
+  user_id: number
+  author_name: text
+  directory_name: text
+  content: text
+  edited_date: date
+  --
+  #user_id : number
+  #user_directory_id
+}
+
+entity "directory_path" as directory_path {
+  +id:number,
+  ancestor_id: number,
+  descendant_id: number,
+}
+
+entity "documents" as documents {
+  +id : number
+  username: text
+  email: text
+}
+
+entity "document_histories" as document_histories {
+  +id : number
+  previous_content: text
+  after_content: text
+  email: text
+}
+
+users ||..o{ user_directory
+users ||..o{ user_project
+user_project ||..o{ projects
+user_directory ||..o{ directories
+projects ||..o{ directories
+directories ||..o{ directory_path
+directories ||..o{ documents
+documents ||..o{ document_histories
+@enduml
