@@ -1,0 +1,44 @@
+@startuml
+' hide the spot
+hide circle
+
+'avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "users" as users {
+  +id : number
+}
+
+entity "reminder" as reminder {
+  +id:number
+  content: text
+  --
+  *user_id
+}
+
+entity "send_to" as send_to {
+    +id: text
+    user_id: number
+}
+
+entity "period" as period{
+  +id:number
+  period_time: date
+  period_type: text
+  period_day: text
+  --
+  *reminder_id: date
+}
+
+entity "event" as event {
+  +id: text
+  content: text
+  is_active: text
+}
+
+users ||..o{ reminder
+users ||..o{ event
+event ||..o{ reminder
+reminder ||--|| period
+reminder ||..o{ send_to
+@enduml
