@@ -1,0 +1,31 @@
+@startuml
+' hide the spot
+hide circle
+
+'avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "users" as users {
+  +id : number
+  name: text
+}
+
+entity "articles" as articles {
+  +id : number
+  title: text
+  *article_histories_id: text
+  creat_at: date
+  update_at: date
+}
+
+entity "article_histories" as article_histories {
+  +id : number
+  title: text
+  content: text
+  update_at: date
+}
+
+users ||..o{ articles
+articles ||..o{ article_histories
+
+@enduml
