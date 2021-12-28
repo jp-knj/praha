@@ -1,0 +1,43 @@
+@startuml
+
+hide circle
+skinparam linetype ortho
+
+entity Novel {
+  + id [PK]
+  --
+  title
+}
+
+entity Novel_comments {
+  + id [PK]
+  + novel_id [FK]
+  --
+  title
+}
+
+entity Manga {
+  + id [PK]
+  --
+  title
+}
+
+entity Manga_comments {
+  + id [PK]
+  + manga_id [FK]
+  --
+  title
+}
+
+entity Comments {
+  + id [PK]
+  --
+  comment
+}
+
+Novel ||--o{ Novel_comments
+Manga ||--o{ Manga_comments
+Comments ||-up-o{ Novel_comments
+Comments ||-up-o{ Manga_comments
+
+@enduml
