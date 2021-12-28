@@ -16,5 +16,24 @@
          3. このテーブルを使用するSQL文に対して、更新が必要になる。これは時間のかかる可能性がある。
 
 ## 課題2
+entity "post" as post {
++id : varchar[PK]
+}
+
+entity "post_tag" as post_tag{
++id:number
+--
+*post_id: varchar[FK]
+*tag_id: varchar[FK]
+}
+
+entity "tag" as tag {
++id: text[PK]
+--
+contents: text
+}
+
+post ||..o{ post_tag
+tag ||..o{ post_tag
 
 ## 課題3
