@@ -1,0 +1,35 @@
+@startuml
+
+hide circle
+skinparam linetype ortho
+
+entity Books {
+  + id [PK]
+  # book_id [FK]
+  --
+}
+
+entity Novel {
+  + id [PK]
+  --
+  title
+}
+
+entity Manga {
+  + id [PK]
+  --
+  title
+}
+
+entity Comments {
+  + id [PK]
+  --
+  # book_id [FK]
+  comment
+}
+
+Books ||--o{ Comments
+Books ||-u-o| Novel
+Books ||-u-o| Manga
+
+@enduml
