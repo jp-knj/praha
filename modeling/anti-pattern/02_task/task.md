@@ -37,3 +37,7 @@ post ||..o{ post_tag
 tag ||..o{ post_tag
 
 ## 課題3
+- ECサイトを開発していると仮定する
+  - 「products」テーブルを作成して「category_id」をカラムとして保持している
+    - テーブル作成時は、category_idはpostsテーブルは単一の値の予定ではあったが、productsテーブルに複数のcaterogy_idを持つことに変更された。　　
+    - 複数の値を持つ可能性のある属性を格納した
