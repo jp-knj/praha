@@ -50,7 +50,8 @@ entity "unread_messages" as unread_messages {
 
 entity "messages" as messages {
   +id : number
-  message_id: number
+  parent_message: number
+  child_message: number
   img: text
   create_at : date
   updated_at: date
