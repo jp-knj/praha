@@ -1,0 +1,51 @@
+@startuml
+
+/'
+  salesforse
+'/
+
+entity customers {
+  + id [PK]
+}
+
+entity customer_info {
+  + id [PK]
+  note
+  --
+  # customer_id [FK]
+}
+
+entity customerMeet {
+  + id [PK]
+  --
+  # customer_id [FK]
+  meet_at
+}
+
+entity contract {
+  + id [PK]
+  --
+  # customer_id [FK]
+  is_canceled
+  cancelled_at
+}
+
+/'
+関係性
+------   :1
+----||   :1 and only 1
+----o|   :0 or 1
+-----{   :many
+----|{   :1 or more
+----o{   :0 or many
+
+entityの位置
+ri ...right
+le ...left
+do ...down
+'/
+
+customers ||..o| customer_info
+customers ||..o| customerMeet
+customers ||..o| contract
+@enduml
