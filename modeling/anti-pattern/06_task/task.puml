@@ -1,19 +1,26 @@
 @startuml
 
 /'
-  students
-  status
+  Assignee
+  Issue
+  Assignee_to
 '/
-entity "students" {
-  id: varchar
+entity "Assignee" {
+  id [PK]
   --
-  *status_id: varchar
-  FOREIGN KEY (status) REFERENCES status(name) ON UPDATE CASCADE
+  name
 }
 
-entity "status" {
-  id: varchar
-  name: text
+entity "Issue" {
+  id [PK]
+  --
+  name
+}
+
+entity "Assignee_to" {
+  id [PK]
+  --
+  name
 }
 
 /'
@@ -31,5 +38,6 @@ le ...left
 do ...down
 '/
 
-students ||..o{ status
+Assignee ||..o{ Issue
+Issue ||..o{ Assignee_to
 @enduml
