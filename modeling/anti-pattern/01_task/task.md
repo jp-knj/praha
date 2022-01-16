@@ -8,23 +8,29 @@ SQL文にパターンマッチが必要する。
 
 ## 答案2
 交差テーブルを作成する
+```
 entity "post" as post{ 
  +id : number, 
  title: text, 
  contents: text,
 }
+```
 
+```
 entity "post_tag" as post_tag {
  +id : number,
 --
  #post_id: number,
  #tag_id: number,
 }
+```
 
+```
 entity "tag" as tag { 
  +id : number, 
  name: text,
 }
+```
 
 ## 答案3
 どんなサービスを開発している時に上記のようなアンチパターンに陥りそうでしょうか？
