@@ -11,7 +11,10 @@
 [NULL 値の操作](https://dev.mysql.com/doc/refman/5.6/ja/working-with-null.html)
 
 ## 課題2
+詳細:task.png
 
+NULLはいかなるデータ型にも属さないが、すべてのデータ型の値を置換できるが、NULLに対する算術の基本ルールが伝播そう。
+NULLが演算の中に含まれると問答無用で結果がNULLになるという原則。
 
 ## 課題３
 MySQLでORDER BY を実行する場合、NULL値の順序はどうなるでしょうか？
