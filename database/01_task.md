@@ -14,5 +14,26 @@ SELECT CustomerID, COUNT(CustomerID) AS number_of_orders
 ### 過去、最も多くのOrderDetailが紐づいたOrderを取得してください。何個OrderDetailが紐づいていたでしょうか？
 
 ```sql
-
+SELECT
+  Temp.OrderID
+  , MAX(Temp.numberOfOrderDetail) AS OrderDetailCount
+FROM
+  (SELECT
+    O.OrderID,
+    COUNT(D.OrderDetailID) AS numberOfOrderDetail
+  FROM
+    [Orders] AS O
+    LEFT JOIN OrderDetails AS D
+      ON O.OrderID = D.OrderID
+  GROUP BY O.OrderID) AS Temp;
 ```
+
+### 「一番お世話になっている運送会社を教えて欲しい」と頼まれました。過去最も多くのOrderが紐づいたShipperを特定してみてください
+```sql
+SELECT ShipperID, COUNT(ShipperID) AS ShippingCount
+FROM [Orders]
+GROUP BY ShipperID 
+ORDER BY ShippingCount DESC;
+```
+
+### 「重要な市場を把握したい」と頼まれました。売上が高い順番にCountryを並べてみましょう
