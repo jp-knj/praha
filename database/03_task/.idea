@@ -1,0 +1,11 @@
+mysql> SELECT CONCAT(employees.first_name, ' ', employees.last_name) AS employee_name, salaries.salary  FROM employees JOIN salaries ON employees.emp_no = salaries.emp_no WHERE salaries.salary = (SELECT MAX(salaries.salary) FROM salaries where to_date = '1997-01-01');
++-------------------+--------+
+| employee_name     | salary |
++-------------------+--------+
+| Shen Sommen       | 117772 |
+| Moto Garigliano   | 117772 |
+| Adib Srimani      | 117772 |
+| Mayumi Garigliano | 117772 |
+| Gregory Tempesti  | 117772 |
++-------------------+--------+
+5 rows in set (4.31 sec)
