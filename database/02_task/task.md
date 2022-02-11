@@ -107,7 +107,79 @@ mysql> EXPLAIN SELECT * FROM employees WHERE last_name = 'masaki';
 
 ```
 
-> **EXPLAIN とは**
+> **EXPLAIN とは**  
 > EXPLAIN ステートメントは、MySQL がステートメントをどのように実行するかに関する情報を提供します。
 参考文献
 - [Mysql](https://dev.mysql.com/doc/refman/8.0/ja/explain.html)
+- 
+
+#### Insert の処理速度を測定する
+```shell
+mysql> INSERT INTO employees (emp_no, first_name, last_name, birth_date, hire_date) VALUES (500000, 'kenji','tomita', '1915-11-30', '1958-05-01');
+Query OK, 1 row affected (0.20 sec)
+```
+
+```shell
+mysql> show index from employees;
++-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+| Table     | Non_unique | Key_name       | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment |
++-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+| employees |          0 | PRIMARY        |            1 | emp_no      | A         |      299513 |     NULL | NULL   |      | BTREE      |         |               |
+| employees |          1 | employees_name |            1 | last_name   | A         |        1518 |     NULL | NULL   |      | BTREE      |         |               |
+| employees |          1 | employees_name |            2 | first_name  | A         |      279014 |     NULL | NULL   |      | BTREE      |         |               |
++-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+3 rows in set (0.00 sec)
+```
+
+```shell
+mysql> DROP INDEX `employees_name` ON employees;
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+```
+
+```shell
+mysql> INSERT INTO employees (emp_no, first_name, last_name, birth_date, hire_date) VALUES (500001, 'kenji','tomita', '1915-11-30', '1958-05-01');
+Query OK, 1 row affected (0.00 sec)
+```
+
+**結論**
+インデックスを作れば作るほど、INSERTが遅くなる
+1つインデックスを作るだけで、非常に大きな違いが生まれます。  
+insertのパフォーマンスを最適化するには、 インデックスの数を小さく保つ事が非常に重要です。  
+インデックスは注意深くかつ慎重に使い、 かつ、可能な限り冗長なインデックスは使わないようにしましょう。これは、delete文やupdate文を使う際にも同じ事が言えます。  
+
+**理由:** 
+1行でもターゲットテーブルの制約に違反すれば、INSERT全体が失敗しロールバックされる。行をターゲットテーブルに挿入する一方で、ワークテーブルの方がトランザクション全体が妥当とみなされるまで、未コミット状態に保っておきます。  
+INSERTがコミットされると、ターゲットテーブルの全インデックスが再構築されるため。
+
+**結論**
+処理速度に関しては、DELETE文にも同様
+インデックスがないと、データベースは削除すべき行を見つけるのにフルテーブルスキャンを 実行しなくてはなりません。つまり、行の削除自体は高速ですが、削除すべき行を見つけるのは非常に遅いという状況になってしまいます。
+
+参考文献
+- [show indexについて](https://dev.mysql.com/doc/refman/5.6/ja/show-index.html)
+- [drop indexについて](https://dev.mysql.com/doc/refman/5.6/ja/drop-index.html)
+- [insert, deleteについて](https://use-the-index-luke.com/ja/sql/dml/insert)
+
+### 課題3 
+- 1997年に入社した従業員数
+- 1997年に入社した従業員の男女比率
+- 20代の従業員の男性の割合
+
+- 給与が平均以上の社員情報を10件取得
+```shell
+mysql> select employees.emp_no, first_name, last_name, salary from employees
+    -> left join salaries on employees.emp_no = salaries.emp_no and to_date='9999-01-01'
+    -> where salary >= ( select avg(salary) from salaries )
+    -> limit 10;
+```
+
+```shell
+mysql> select count(case when gender = 'M' THEN 'M' ELSE null END ) as man, count(case when gender = 'F' THEN 'F' ELSE null END ) as woman from employees;
++--------+--------+
+| man    | woman  |
++--------+--------+
+| 179975 | 120051 |
++--------+--------+
+1 row in set, 65535 warnings (0.18 sec)
+```
