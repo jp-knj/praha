@@ -81,12 +81,22 @@ SELECT DATE_FORMAT(hire_date, '%M') AS month, COUNT(*) AS total_hires FROM emplo
 # Query_time: 0.146814  Lock_time: 0.000172 Rows_sent: 1  Rows_examined: 300039
 SET timestamp=1644650477;
 SELECT DATE_FORMAT(hire_date, '%M') AS month, COUNT(*) AS total_hires FROM employees GROUP BY month ORDER BY total_hires DESC LIMIT 1;
-
 ```
 参考文献
 - [long_query_timerについて](https://dev.mysql.com/doc/refman/5.6/ja/server-system-variables.html#sysvar_long_query_time)
 ## 課題2
 
+```shell
+mysqldumpslow -s ct // 最も頻度高くスロークエリに現れるクエリ
+
+mysqldumpslow -s t // 実行時間が最も長いクエリ
+
+mysqldumpslow -s lt // ロック時間が最も長いクエリ
+```
+
+参考文献
+- [mysqldumpslowについて](https://dev.mysql.com/doc/refman/8.0/en/mysqldumpslow.html)
+- [オプションについて(-t, -s)](https://dev.mysql.com/doc/refman/8.0/en/mysqldumpslow.html#option_mysqldumpslow_sort)
 ## 課題3
 
 ## 課題4
