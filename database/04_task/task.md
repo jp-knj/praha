@@ -100,7 +100,119 @@ mysqldumpslow -s lt // ロック時間が最も長いクエリ
 ## 課題3
 
 ## 課題4
+**limitについて**
+```shell
+mysql> select * from hoge order by id desc limit 100, 10;
+```
+「データを100から10個だけ取得」ではなく「110個データを取得してから先頭から100個を捨てる」という処理が行われるため。
 
+もしかしたらら、Where句で`between`を使用して実行すると処理速度が上がるかも？
+
+**ONとJOINについて**
+結論から、全て同じ結果が表示される
+
+JOIN する前に、データ取得するのが、ON 
+JOIN　した後に、データ取得するのが　WHERE になる。
+
+SQL言語によって依存されるため、実際に実行して書き換えて方が良い。
+```shell
+SELECT *
+FROM facebook
+JOIN linkedin
+ON facebook.name = linkedin.name
+```
+```shell
+SELECT *
+FROM facebook
+JOIN linkedin
+WHERE facebook.name = linkedin.name
+```
+```shell
+SELECT *
+FROM facebook, linkedin
+WHERE facebook.name = linkedin.name
+```
+
+**left outter joinの場合の ON vs WHERE**
+1. documents
+
+| id  | name      |     
+|:----|:----------|
+| 1   | Document1 |  
+| 2   | Document2 |  
+| 3   | Document3 |  
+| 4   | Document4 |  
+| 5   | Document5 |  
+
+2. downloads
+
+| id  | document_id | username   |   
+|:----|:------------|:-----------|
+| 1   | 1           | sandeep    | 
+| 2   | 1           | simi       | 
+| 3   | 2           | sandeep    | 
+| 4   | 2           | reya       | 
+| 5   | 3           | simi       | 
+
+- WHEREを使用した場合: (JOINした後、Recordをフィルタリングする)
+```shell
+   SELECT documents.name, downloads.id
+     FROM documents
+     LEFT OUTER JOIN downloads
+       ON documents.id = downloads.document_id
+     WHERE username = 'sandeep'
+```
+
+JOINされたテーブル
+
+| id(from documents) | name      | id(from downloads) | document_id | username |   
+|:-------------------|:----------|:-------------------|:------------|:---------|
+| 1                  | Document1 | 1                  | 1           | sandeep  |
+| 1                  | Document1 | 2                  | 1           | simi     |
+| 2                  | Document2 | 3                  | 2           | sandeep  |
+| 2                  | Document2 | 4                  | 2           | reya     |
+| 3                  | Document3 | 5                  | 3           | simi     |
+| 4                  | Document4 | NULL               | NULL        | NULL     |
+| 5                  | Document5 | NULL               | NULL        | NULL     |
+
+**実行結果:**
+
+| name      | id  |    
+|:----------|:----|
+| Document1 | 1   |
+| Document2 | 3   |
+
+- ONを使用した場合: (JOINする前、Recordをフィルタリングする)
+```shell
+  SELECT documents.name, downloads.id
+   FROM documents
+     LEFT OUTER JOIN downloads
+       ON documents.id = downloads.document_id
+         AND username = 'sandeep'
+```
+
+JOINされたテーブル
+
+| id(from documents) | name      | id(from downloads) | document_id | username |   
+|:-------------------|:----------|:-------------------|:------------|:---------|
+| 1                  | Document1 | 1                  | 1           | sandeep  |
+| 2                  | Document2 | 3                  | 2           | sandeep  |
+| 3                  | Document3 | NULL               | 2           | sandeep  |
+| 4                  | Document4 | NULL               | 2           | sandeep  |
+| 5                  | Document5 | NULL               | 2           | sandeep  |
+
+**実行結果:**
+
+| name      | id   |    
+|:----------|:-----|
+| Document1 | 1    |
+| Document2 | 3    |
+| Document3 | NULL |
+| Document4 | NULL |
+| Document5 | NULL |
+
+**参考文献**
+- [JOIN WHERE VS JOIN ON](https://stackoverflo~.com/questions/354070/sql-join-~here-clause-vs-on-clause)
 ## 課題5
 
 ## 課題6
