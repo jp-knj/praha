@@ -1,61 +1,60 @@
 # SQL10本ノック
 
 ## 課題1
-### 96年に3回以上注文した（Ordersが3つ以上紐づいている）Customerのidと、注文回数
 
+**1.1996年に3回以上注文した（Ordersが3つ以上紐づいている）CustomerのIDと、注文回数を取得**
 ```sql
 SELECT 
     CustomerID, 
-    COUNT(CustomerID) AS number_of_orders 
-FROM [Orders]
- WHERE OrderDate BETWEEN '1996-01-01' AND '1996-12-31'
-       GROUP BY CustomerID
-       HAVING number_of_orders >= 3
-       ORDER BY number_of_orders DESC
+    COUNT(CustomerID) AS OrderCount
+FROM Orders
+WHERE OrderDate BETWEEN '1996-01-01' AND '1996-12-31'
+	GROUP BY CustomerID
+    HAVING OrderCount >= 3
+    ORDER BY OrderCount DESC
 ```
 
-### 過去、最も多くのOrderDetailが紐づいたOrderを取得してください。何個OrderDetailが紐づいていたでしょうか？
-
+**2.過去最も多くのOrderDetailが紐づいたOrderを取得**
 ```sql
-SELECT
-  Temp.OrderID, 
-  MAX(Temp.numberOfOrderDetail) AS OrderDetailCount
+SELECT View.OrderID, MAX(OrderDetailCounts) AS OrderDetailCount 
 FROM
-  (SELECT
-    O.OrderID,
-    COUNT(D.OrderDetailID) AS numberOfOrderDetail
-  FROM
-    [Orders] AS O
-    JOIN OrderDetails AS D
-      ON O.OrderID = D.OrderID
-  GROUP BY O.OrderID) AS Temp;
+    (SELECT O.OrderID, COUNT(OD.OrderDetailID) AS OrderDetailCounts FROM Orders AS O
+	    INNER JOIN OrderDetails AS OD
+    	    ON OD.OrderID = O.OrderID
+            GROUP BY O.OrderID
+    ) AS View
+```
+**参考文献** 
+- [サブクエリについて](https://www.techscore.com/tech/sql/SQL7/)
+- [サブクエリの動きや応用、テーブル結合との組み合わせについて](https://www.techscore.com/tech/sql/SQL7/)
+
+**3.Order数が多い順番にShipperのidを並べてください。Order数も表示してください**
+```sql
+SELECT ShipperID, COUNT(ShipperID) AS ShippingCount 
+FROM Orders
+	GROUP BY ShipperID
+    ORDER BY ShippingCount DESC;
 ```
 
-### 「一番お世話になっている運送会社を教えて欲しい」と頼まれました。過去最も多くのOrderが紐づいたShipperを特定してみてください
-
+**4.売上が高い順番にCountryを並べてください。売上も表示してください**
 ```sql
-SELECT ShipperID, COUNT(ShipperID) AS ShippingCount
-FROM [Orders]
-GROUP BY ShipperID 
-ORDER BY ShippingCount DESC;
-```
-
-### 「重要な市場を把握したい」と頼まれました。売上が高い順番にCountryを並べてみましょう
-
-```sql
-SELECT
-	ROUND(SUM(OD.Quantity * P.Price)) AS Sales
-  , C.Country
-FROM
-  [Orders] AS O
-    JOIN Customers AS C
-      ON O.CustomerID = C.CustomerID
-    JOIN OrderDetails AS OD
-      ON O.OrderID = OD.OrderID
-    JOIN Products AS P
-      ON OD.ProductID = P.ProductID
-GROUP BY C.Country
-ORDER BY Sales DESC;
+SELECT C.Country, ROUND(SUM(View.Sale)) AS Sales
+FROM (
+	SELECT
+		O.OrderID,
+    	O.CustomerID,	
+    	(OD.Quantity * P.Price) AS Sale
+	FROM
+		Orders AS O
+    		JOIN OrderDetails AS OD 
+    			ON O.OrderID = OD.OrderID
+    		JOIN Products P 
+    			ON P.ProductID = OD.ProductID
+    ) AS View 
+   	JOIN Customers AS C 
+    	ON View.CustomerID = C.CustomerID
+    GROUP BY C.Country
+    ORDER BY Sales DESC
 ```
 
 ### 国ごとの売上を年毎に（1月1日~12月31日の間隔で）集計してください
