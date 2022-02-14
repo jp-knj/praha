@@ -2,7 +2,7 @@
 
 ## 課題1
 
-**1.1996年に3回以上注文した（Ordersが3つ以上紐づいている）CustomerのIDと、注文回数を取得**
+**1. 1996年に3回以上注文した（Ordersが3つ以上紐づいている）CustomerのIDと、注文回数を取得**
 ```sql
 SELECT 
     CustomerID, 
@@ -14,7 +14,8 @@ WHERE OrderDate BETWEEN '1996-01-01' AND '1996-12-31'
     ORDER BY OrderCount DESC
 ```
 
-**2.過去最も多くのOrderDetailが紐づいたOrderを取得**
+
+**2. 過去最も多くのOrderDetailが紐づいたOrderを取得**
 ```sql
 SELECT View.OrderID, MAX(OrderDetailCounts) AS OrderDetailCount 
 FROM
@@ -24,9 +25,12 @@ FROM
             GROUP BY O.OrderID
     ) AS View
 ```
+
+
 **参考文献** 
 - [サブクエリについて](https://www.techscore.com/tech/sql/SQL7/)
 - [サブクエリの動きや応用、テーブル結合との組み合わせについて](https://www.techscore.com/tech/sql/SQL7/)
+
 
 **3.Order数が多い順番にShipperのidを並べてください。Order数も表示してください**
 ```sql
@@ -35,6 +39,7 @@ FROM Orders
 	GROUP BY ShipperID
     ORDER BY ShippingCount DESC;
 ```
+
 
 **4.売上が高い順番にCountryを並べてください。売上も表示してください**
 ```sql
@@ -50,12 +55,13 @@ FROM (
     			ON O.OrderID = OD.OrderID
     		JOIN Products P 
     			ON P.ProductID = OD.ProductID
-    ) AS View 
-   	JOIN Customers AS C 
-    	ON View.CustomerID = C.CustomerID
+    ) AS View   
+   	JOIN Customers AS C   
+    	ON View.CustomerID = C.CustomerID  
     GROUP BY C.Country
     ORDER BY Sales DESC
 ```
+
 
 ### 国ごとの売上を年毎に（1月1日~12月31日の間隔で）集計してください
 ```sql
