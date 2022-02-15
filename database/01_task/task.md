@@ -14,7 +14,7 @@ WHERE OrderDate BETWEEN '1996-01-01' AND '1996-12-31'
     ORDER BY OrderCount DESC
 ```
 
-
+----
 **2. 過去最も多くのOrderDetailが紐づいたOrderを取得**
 ```sql
 SELECT View.OrderID, MAX(OrderDetailCounts) AS OrderDetailCount 
@@ -26,13 +26,13 @@ FROM
     ) AS View
 ```
 
-
+----
 **参考文献** 
 - [サブクエリについて](https://www.techscore.com/tech/sql/SQL7/)
 - [サブクエリの動きや応用、テーブル結合との組み合わせについて](https://www.techscore.com/tech/sql/SQL7/)
 
-
-**3.Order数が多い順番にShipperのidを並べてください。Order数も表示してください**
+----
+**3. Order数が多い順番にShipperのidを並べてください。Order数も表示してください**
 ```sql
 SELECT ShipperID, COUNT(ShipperID) AS ShippingCount 
 FROM Orders
@@ -40,8 +40,8 @@ FROM Orders
     ORDER BY ShippingCount DESC;
 ```
 
-
-**4.売上が高い順番にCountryを並べてください。売上も表示してください**
+----
+**4. 売上が高い順番にCountryを並べてください。売上も表示してください**
 ```sql
 SELECT C.Country, ROUND(SUM(View.Sale)) AS Sales
 FROM (
@@ -62,26 +62,37 @@ FROM (
     ORDER BY Sales DESC
 ```
 
-
-### 国ごとの売上を年毎に（1月1日~12月31日の間隔で）集計してください
+----
+**5. 国ごとの売上を年毎に（1月1日~12月31日の間隔で）集計してください**
 ```sql
-SELECT
-	ROUND(SUM(OD.Quantity * P.Price)) AS Sales,
-    strftime('%Y', O.OrderDate) AS OrderYear,
-    C.Country
-FROM
-	[Orders] AS O
-    JOIN Customers AS C
-    	ON O.CustomerID = C.CustomerID
-    JOIN OrderDetails AS OD
-    	ON O.OrderID = OD.OrderID
-    JOIN Products AS P
-    	ON OD.ProductID = P.ProductID
-    GROUP BY C.Country
-    ORDER BY C.Country ASC;
+SELECT 
+    ROUND(SUM(View.Sale)) AS sales,
+    View.OrderYear,
+	C.Country
+FROM (
+	SELECT 
+		O.OrderID,
+    	O.CustomerID,
+		strftime('%Y', O.OrderDate) AS OrderYear,
+    	(OD.Quantity * P.Price) AS Sale
+    FROM
+      Orders AS O
+      JOIN OrderDetails AS OD 
+      	ON O.OrderID = OD.OrderID
+      JOIN Products AS P 
+      	ON P.ProductID = OD.ProductID
+  ) AS View
+  JOIN Customers AS C 
+  	ON View.CustomerID = C.CustomerID
+    GROUP BY
+    	C.Country,
+        View.OrderYear
+    ORDER BY
+    	C.Country
 ```
 
-> `strftime関数` は日付のフォーマットを指定することができます。
+> **`strftime関数`とは？** 
+> 日付のフォーマットを指定することができます。
 > フォーマットの指定は任意の文字と下記の特殊な文字を組み合わせて指定します。  
 > **e.g**   
 > date(...)        strftime('%Y-%m-%d', ...)  
@@ -89,31 +100,34 @@ FROM
 > datetime(...)    strftime('%Y-%m-%d %H:%M:%S', ...)  
 > julianday(...)   strftime('%J', ...)
 
-### 「社内の福利厚生の規定が変わったので、年齢が一定以下の社員には、それとわかるようにフラグを立てて欲しい」と頼まれました
-- Employeeテーブルに「Junior（若手）」カラム（boolean）を追加して、若手に分類されるEmployeeレコードの場合はtrueにしてください
-- Juniorの定義：誕生日が1960年より後のEmployeeの場合は値をTRUEにする更新クエリを作成してください
+----
+**「社内の福利厚生の規定が変わったので、年齢が一定以下の社員には、それとわかるようにフラグを立てて欲しい」と頼まれました**  
+- Employeeテーブルに「Junior（若手）」カラム（boolean）を追加して、若手に分類されるEmployeeレコードの場合はtrueにしてください  
 ```sql
-ALTER TABLE Employees ADD Junior Boolean DEFAULT false NOT NULL;
+ALTER TABLE Employees 
+ADD Junior Boolean DEFAULT false NOT NULL;
 ```
 
+- Juniorの定義：誕生日が1960年より後のEmployeeの場合は値をTRUEにする更新クエリを作成してください  
 ```sql
-UPDATE Employees SET Junior = 1 WHERE BirthDate > '1960-01-01';
+UPDATE
+  Employees
+SET
+  Junior = CASE
+    WHEN BirthDate >= '1960-01-01' THEN TRUE
+    ELSE false
+  END;
 ```
 
-```sql
-SELECT * FROM Employees
-```
-
-
-### 「長くお世話になった運送会社には運送コストを多く払うことになったので、たくさん運送をお願いしている業者を特定して欲しい」と頼まれました
-「long_relation」カラム（boolean）をShipperテーブルに追加してください
+----
+**「長くお世話になった運送会社には運送コストを多く払うことになったので、たくさん運送をお願いしている業者を特定して欲しい」と頼まれました**
 long_relationがtrueになるべきShipperレコードを特定して、long_relationをtrueにしてください
-long_relationの定義：これまでに70回以上、Orderに関わったShipper（つまり発注を受けて運搬作業を実施した運送会社）
 
+- 「long_relation」カラム（boolean）をShipperテーブルに追加してください
 ```sql
 ALTER TABLE Employees ADD Junior Boolean DEFAULT false NOT NULL;
 ```
-
+- long_relationの定義：これまでに70回以上、Orderに関わったShipper（つまり発注を受けて運搬作業を実施した運送会社）
 ```sql
 UPDATE Shipper SET LongRelation = true
 WHERE 
@@ -127,23 +141,21 @@ GROUP BY ShipperID
 HAVING ShippingCount >= 70);
 ```
 
-
-
-### 「それぞれのEmployeeが最後に担当したOrderと、その日付を取得してほしい」と頼まれました
+----
+**「それぞれのEmployeeが最後に担当したOrderと、その日付を取得してほしい」と頼まれました**
 - OrderID, EmployeeID, 最も新しいOrderDate
-- 上記のような情報が得られるクエリを描いてください
-ヒント：何らかのaggregate function（集約関数）を使う必要があるでしょう
 
 ```sql
 SELECT 
     EmployeeID, 
     MAX(OrderDate) AS LatestOrderDate
-FROM [Orders]
-GROUP BY EmployeeID 
-ORDER BY EmployeeID ASC;
+FROM Orders
+    GROUP BY EmployeeID 
+    ORDER BY EmployeeID ;
 ```
 
-### Customerテーブルで任意の１レコードのCustomerNameをNULLにしてください
+----
+**Customerテーブルで任意の１レコードのCustomerNameをNULLにしてください**
 - Customerテーブルで任意の１レコードのCustomerNameをNULLにしてください
 ```sql
     UPDATE Customers SET CustomerName = null WHERE CustomerID = 1;
@@ -221,6 +233,7 @@ SELECT → FROM → WHERE → GROUPBY → HAVING → ORDERBY
 **学べたこと**
 実行順番を意識しながら書くようにすること。
 
+----
 - SQLの文脈においてDDL、DML、DCL、TCLとは何でしょうか？それぞれ説明してください  
 
 `DDL` : **データ宣言言語(Data Declaration Language)**   
@@ -245,3 +258,6 @@ TCLはトランザクションを制御する命令になります。
 
 ## 課題3
 ### SQLクエリについて問題を作成する
+- **INNER JOIN**では、条件を指定し、結合するテーブルとテーブルの二つに一致するデータを抽出することができますが、**CROSS JOIN**はどのようなデータを取得するでしょうか？
+- **OrderDetailsテーブル**のQuantityカラムの値が30以下、30に等しい、30以上であることを求めたい。(CASE句を使用する) 
+- **Productsテーブル**の**Priceが25以下**の**供給者の氏名(SupplierName)**を抽出したい(EXIST句を使用する)
