@@ -26,11 +26,12 @@ FROM
     ) AS View
 ```
 
+view って名前どうなの？
 ----
 **参考文献** 
 - [サブクエリについて](https://www.techscore.com/tech/sql/SQL7/)
 - [サブクエリの動きや応用、テーブル結合との組み合わせについて](https://www.techscore.com/tech/sql/SQL7/)
-
+- [予約語と名前を重複させない](https://dev.mysql.com/doc/refman/5.6/ja/reserved-words.html#reserved-words-5-6-V)
 ----
 **3. Order数が多い順番にShipperのidを並べてください。Order数も表示してください**
 ```sql
