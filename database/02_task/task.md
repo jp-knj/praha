@@ -6,7 +6,11 @@
 
 特に大きなテーブルでは、インデックスを用いることにより、大幅にそのパフォーマンスが改善されます。  
 
-***
+**参考文献**
+- [B木について](https://qiita.com/kiyodori/items/f66a545a47dc59dd8839)
+
+<details><summary>インデックスの補足説明</summary>
+
 **インデックスの補足説明**  
 インデックスには２種類ほどある
 - 主インデックス
@@ -14,9 +18,8 @@
 
 主キー制約や一意制約を作ると暗黙にインデックスは生成される場合がある。  
 二次インデックスは、パフォーマンス改善のために任意の列に付与されるインデックスのこと。
-***
 
-### 正規化とインデックス
+**正規化とインデックス**  
 インデックスを効果的に使用するには、DB設計が肝要
 
 ***
@@ -28,6 +31,7 @@
 - NULLの値を検索するのは、物理的には連続した領域をスキャンすることに他ならないため。
 - NULLの値を検索するという前提で、NULLの比率が多い場合はそのインデックスを用いた検索は非常に非効率的になる。　　
 ***
+</details>
 
 ### slow query log を調べる理由とは
 テーブルにインデックスをベタベタと貼りすぎると、挿入、更新、削除といった操作が遅くなる。
@@ -35,9 +39,13 @@
 
 インデックスが多すぎるとオプティマイザが混乱して、どれを選べばいいのか分からなくなってしまうという弊害がある。
 
-> **slow query log** とは？
-> 
+<details><summary>slow query logとは？</summary>
+
 > スロークエリログ (Slow query log) は、MySQL で出力できるログの種類の1つです。 SQL の実行時間が指定した時間よりもかかってしまった SQL を全て出力することができます。 これにより、アプリケーション構築時や本番運用時にパフォーマンスのボトルネックとなっている SQL を発見するのに大いに役に立ちます。
+
+**参考文献**
+- [スロークエリログについて](https://dev.mysql.com/doc/refman/5.6/ja/slow-query-log.html)
+</details>
 
 ### カーディナリティー について
 カーディナリティとは、テーブルにカラムがあるとして、カラムに格納されているデータの種類がどのくらいあるのか(カラムの値の種類の絶対値)を、カーディナリティという。
@@ -51,10 +59,9 @@
 複数の検索条件に対して最大公約数的に、カーディナリティが高いカラムだけおを含んだインデックスを作る。
 
 ### カバリングインデックスとは？
-クエリの実行に必要なカラムがあるインデックスにすべて含まれていれば、テーブル本体にアクセスせず、インデックスだけにアクセスすることでクエリを解決することがある。
-インデックスのサイズを大きくなるのを覚悟の上で、あえて余分なカラムをインデックスに含め、頻繁に実行されるクエリがインデックスオンリースキャンになるようにする。
+クエリの実行に必要なカラムがあるインデックスにすべて含まれていれば、テーブル本体にアクセスせず、インデックスだけにアクセスすることでクエリを解決することがある。 （インデックスのリーフだけでデータを取得)
 
-ディスクスペースと更新性能は、少し下がりますが、高頻度で実行されるクエリであればカバリングインデックスにしても良いのではないだろうか
+<details><summary>調べたこと</summary>
 
 ### インデックスが使用される構文
 どのようなSQLの構文においてインデックスが利用可能であるかを知っておく必要がある。
@@ -69,122 +76,287 @@
 **相関サブクエリ**  
 JOINの場合と同様で、WHERE句の条件と、サブクエリの双方を考慮したインデックス設計が求められます。
 ***
+</details>
 
 **参考文献**
 - [カバリングインデックスについて](https://dev.mysql.com/doc/refman/5.6/ja/optimizing-innodb-queries.html)
 ## 課題２
 
-### 対象のテーブル
+<details><summary>実行時間の取得方法</summary>
+
 ```shell
-+------------+---------------+------+-----+---------+-------+  
-| Field      | Type          | Null | Key | Default | Extra |  
-+------------+---------------+------+-----+---------+-------+  
-| emp_no     | int(11)       | NO   | PRI | NULL    |       |  
-| birth_date | date          | NO   |     | NULL    |       |  
-| first_name | varchar(14)   | NO   |     | NULL    |       |  
-| last_name  | varchar(16)   | NO   |     | NULL    |       |  
-| gender     | enum('M','F') | NO   |     | NULL    |       |  
-| hire_date  | date          | NO   |     | NULL    |       |  
-+------------+---------------+------+-----+---------+-------+   
-```
-#### WHERE句を1つだけ含むSELECTクエリを3つほど列挙する
-```sql
-SELECT * FROM employees WHERE last_name = 'masaki';
-```
-> 184 rows in set (0.09 sec)
-
-```sql
-SELECT * FROM employees WHERE first_name = 'satoru';
-```
-> 236 rows in set (0.09 sec)
-
-```sql
-SELECT * FROM employees WHERE hire_date = 1998-03-13;
-```
-> Empty set, 1 warning (0.09 sec)
-
-#### クエリを実行して、取得に要した時間を測定する
-```sql
-SHOW VARIABLES LIKE 'performance_schema';
+-- 履歴を取得
+SELECT 
+    sql_text, 
+    TRUNCATE(timer_wait/1000000000000, 6) as time 
+FROM 
+    performance_schema.events_statements_history`
+;
 ```
 
 ```shell
-+--------------------+-------+
-| Variable_name      | Value |
-+--------------------+-------+
-| performance_schema | ON    |
-+--------------------+-------+
-1 row in set (0.00 sec)
+-- 履歴の最新10件を取得
+SELECT 
+    event_id, 
+    sql_text, 
+    TRUNCATE(timer_wait/1000000000000, 6) as time 
+FROM performance_schema.events_statements_history 
+  ORDERBY event_id 
+    DESC limit 10;
 ```
 
-> **パフォーマンススキーマ (performance_schema)** とは？
-> サーバーパフォーマンスに与える影響を最小にしながら、サーバー実行に関する有益な情報へのアクセスを提供することを目的としています。
-参考文献
- - [Mysql](https://dev.mysql.com/doc/refman/5.6/ja/performance-schema.html#:~:text=%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%AF%E3%80%81%E3%82%B5%E3%83%BC%E3%83%90%E3%83%BC%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9,%E3%81%AF%E5%A4%89%E6%9B%B4%E3%81%95%E3%82%8C%E3%81%BE%E3%81%9B%E3%82%93%E3%80%82)
-
-#### 高速化するインデックスを作成
-```sql
-CREATE INDEX employees_name ON 
-    employees (last_name, first_name)
-```
-
-**実行クエリ**
-```sql
-SELECT * FROM employees WHERE last_name = 'masaki';
-```
-
-**実行結果**
 ```shell
-184 rows in set (0.01 sec)
+-- 履歴を削除 
+TRUNCATE TABLE performance_schema.events_statements_history_long;
 ```
 
-#### EXPLAIN を使用する
+**参考文献**
+- [performance schemaについて](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-query-profiling.html)
+- [performance shemaの履歴取得について](https://dev.mysql.com/doc/refman/8.0/en/performance-schema-event-tables.html)
+- [TRUNCATE TABLE 構文について](https://dev.mysql.com/doc/refman/5.6/ja/truncate-table.html)
+
+</details>
+
+### WHERE句を1つだけ含むSELECTクエリを3つほど列挙する
+**クエリ１**
 ```shell
-mysql> EXPLAIN SELECT * FROM employees WHERE last_name = 'masaki';
-+----+-------------+-----------+------------+------+----------------+----------------+---------+-------+------+----------+-------+
-| id | select_type | table     | partitions | type | possible_keys  | key            | key_len | ref   | rows | filtered | Extra |
-+----+-------------+-----------+------------+------+----------------+----------------+---------+-------+------+----------+-------+
-|  1 | SIMPLE      | employees | NULL       | ref  | employees_name | employees_name | 18      | const |  184 |   100.00 | NULL  |
-+----+-------------+-----------+------------+------+----------------+----------------+---------+-------+------+----------+-------+
-1 row in set, 1 warning (0.00 sec)
+-- first_nameがXから始まる従業員
+SELECT * 
+FROM employees 
+    WHERE first_name like 'X%';
 ```
+
+**クエリ2**
+```shell
+-- last_nameがYから始まる従業員
+SELECT * 
+FROM employees 
+    WHERE last_name like 'Y%';
+```
+
+**クエリ3**
+```shell
+SELECT * 
+FROM employees 
+  WHERE hire_date = '1997-02-14';
+```
+
+###　取得時間の計測
+**クエリ１**  
+
+```shell
+-- first_name のインデックスを付与
+CREATE INDEX first_name_idx ON 
+    employees (first_name)
+```
+<details>
+    <summary>インデックスの付与前の実行結果</summary>
+
+```shell
++----------+----------------------------------------------------+----------+
+| event_id | sql_text                                           | time     |
++----------+----------------------------------------------------+----------+
+|       68 | select * from employees where first_name like 'X%' | 0.095434 |
+|       67 | select * from employees where first_name like 'X%' | 0.083297 |
+|       66 | select * from employees where first_name like 'X%' | 0.109143 |
++----------+----------------------------------------------------+----------+
+```
+
+</details>
+
+<details>
+    <summary>インデックスの付与後の実行結果</summary>
+
+```shell
++----------+------------------------------------------------------------------------------------------------------------------------------------------------------------+----------+
+| event_id | sql_text                                                                                                                                                   | time     |
++----------+------------------------------------------------------------------------------------------------------------------------------------------------------------+----------+
+|       59 | select * from employees where first_name like 'X%'                                                                                                         | 0.008920 |
+|       58 | select * from employees where first_name like 'X%'                                                                                                         | 0.016106 |
+|       57 | select * from employees where first_name like 'X%'                                                                                                         | 0.010801 |
++----------+------------------------------------------------------------------------------------------------------------------------------------------------------------+----------+
+```
+
+</details>
+
+**結果**  
+付与前と付与後を比較した時に、取得時間に**7倍**差がある
+
+<details>
+    <summary>EXPAINを使用した結果</summary>
+
+```shell
++----+-------------+-----------+------------+-------+----------------+----------------+---------+------+------+----------+-----------------------+
+| id | select_type | table     | partitions | type  | possible_keys  | key            | key_len | ref  | rows | filtered | Extra                 |
++----+-------------+-----------+------------+-------+----------------+----------------+---------+------+------+----------+-----------------------+
+|  1 | SIMPLE      | employees | NULL       | range | first_name_idx | first_name_idx | 16      | NULL | 4687 |   100.00 | Using index condition |
++----+-------------+-----------+------------+-------+----------------+----------------+---------+------+------+----------+-----------------------+
+
+```
+</details>
+
+**クエリ2**
+
+```shell
+-- last_name_idx のインデックスを付与
+CREATE INDEX last_name_idx ON 
+    employees (last_name)
+```
+<details>
+    <summary>インデックスの付与前の実行結果</summary>
+
+```shell
++----------+---------------------------------------------------+----------+
+| event_id | sql_text                                          | time     |
++----------+---------------------------------------------------+----------+
+|       73 | select * from employees where last_name like 'Y%' | 0.080488 |
+|       72 | select * from employees where last_name like 'Y%' | 0.095190 |
+|       71 | select * from employees where last_name like 'Y%' | 0.089395 |
++----------+---------------------------------------------------+----------+
+
+```
+</details>
+
+<details>
+    <summary>インデックスの付与後の実行結果</summary>
+
+```shell
++----------+---------------------------------------------------+----------+
+| event_id | sql_text                                          | time     |
++----------+---------------------------------------------------+----------+
+|       80 | select * from employees where last_name like 'Y%' | 0.008937 |
+|       79 | select * from employees where last_name like 'Y%' | 0.008336 |
+|       78 | select * from employees where last_name like 'Y%' | 0.009638 |
++----------+---------------------------------------------------+----------+
+
+```
+
+</details>
+
+**結果**  
+付与前と付与後を比較した時に、取得時間に**10倍**差がある
+
+<details>
+    <summary>EXPAINを使用した結果</summary>
+
+```shell
++----+-------------+-----------+------------+-------+---------------+---------------+---------+------+------+----------+-----------------------+
+| id | select_type | table     | partitions | type  | possible_keys | key           | key_len | ref  | rows | filtered | Extra                 |
++----+-------------+-----------+------------+-------+---------------+---------------+---------+------+------+----------+-----------------------+
+|  1 | SIMPLE      | employees | NULL       | range | last_name_idx | last_name_idx | 18      | NULL | 1782 |   100.00 | Using index condition |
++----+-------------+-----------+------------+-------+---------------+---------------+---------+------+------+----------+-----------------------+
+
+```
+</details>
+
+**クエリ3**
+
+```shell
+-- hire_date のインデックスを付与
+CREATE INDEX hire_date_idx ON 
+    employees (hire_date)
+```
+<details>
+    <summary>インデックスの付与前の実行結果</summary>
+
+```shell
++----------+--------------------------------------------------------+----------+
+| event_id | sql_text                                               | time     |
++----------+--------------------------------------------------------+----------+
+|       89 | select * from employees where hire_date = '1997-02-14' | 0.097270 |
+|       88 | select * from employees where hire_date = '1997-02-14' | 0.096131 |
+|       87 | select * from employees where hire_date = '1997-02-14' | 0.096195 |
++----------+--------------------------------------------------------+----------+
+
+```
+</details>
+
+<details>
+    <summary>インデックスの付与後の実行結果</summary>
+
+```shell
++----------+--------------------------------------------------------+----------+
+| event_id | sql_text                                               | time     |
++----------+--------------------------------------------------------+----------+
+|       94 | select * from employees where hire_date = '1997-02-14' | 0.002089 |
+|       93 | select * from employees where hire_date = '1997-02-14' | 0.000993 |
+|       92 | select * from employees where hire_date = '1997-02-14' | 0.002603 |
++----------+--------------------------------------------------------+----------+
+```
+
+</details>
+
+**結果**  
+付与前と付与後を比較した時に、取得時間に**22倍**差がある
+
+<details>
+    <summary>EXPAINを使用した結果</summary>
+
+```shell
++----+-------------+-----------+------------+------+---------------+---------------+---------+-------+------+----------+-------+
+| id | select_type | table     | partitions | type | possible_keys | key           | key_len | ref   | rows | filtered | Extra |
++----+-------------+-----------+------------+------+---------------+---------------+---------+-------+------+----------+-------+
+|  1 | SIMPLE      | employees | NULL       | ref  | hire_date_idx | hire_date_idx | 3       | const |   20 |   100.00 | NULL  |
++----+-------------+-----------+------------+------+---------------+---------------+---------+-------+------+----------+-------+
+
+```
+</details>
 
 > **EXPLAIN とは**  
 > EXPLAIN ステートメントは、MySQL がステートメントをどのように実行するかに関する情報を提供します。
 参考文献
-- [Mysql](https://dev.mysql.com/doc/refman/8.0/ja/explain.html)
-- 
+- [explain について](https://dev.mysql.com/doc/refman/8.0/ja/explain.html)
 
-#### Insert の処理速度を測定する
+### Insert の処理速度を測定する
+
+<detail>
+    <summary>テーブルにインデックスを付与</summary>
+
 ```shell
-mysql> INSERT INTO employees (emp_no, first_name, last_name, birth_date, hire_date) VALUES (500000, 'kenji','tomita', '1915-11-30', '1958-05-01');
+-- 全てのカラムにインデックスを付与
+mysql> SHOW KEYS FROM employees;
++-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+| Table     | Non_unique | Key_name       | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment |
++-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+| employees |          0 | PRIMARY        |            1 | emp_no      | A         |      299512 |     NULL | NULL   |      | BTREE      |         |               |
+| employees |          1 | last_name_idx  |            1 | last_name   | A         |        1635 |     NULL | NULL   |      | BTREE      |         |               |
+| employees |          1 | hire_date_idx  |            1 | hire_date   | A         |        6075 |     NULL | NULL   |      | BTREE      |         |               |
+| employees |          1 | first_name_idx |            1 | first_name  | A         |        1205 |     NULL | NULL   |      | BTREE      |         |               |
+| employees |          1 | birth_date_idx |            1 | birth_date  | A         |        4735 |     NULL | NULL   |      | BTREE      |         |               |
++-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+
+```
+</detail>
+
+
+```shell
+-- データを挿入
+mysql> INSERT INTO employees (emp_no, first_name, last_name, birth_date, hire_date) VALUES (500002, 'kenji','tomita', '1915-11-30', '1958-05-01');
 Query OK, 1 row affected (0.20 sec)
 ```
 
 ```shell
-mysql> show index from employees;
-+-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
-| Table     | Non_unique | Key_name       | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment |
-+-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
-| employees |          0 | PRIMARY        |            1 | emp_no      | A         |      299513 |     NULL | NULL   |      | BTREE      |         |               |
-| employees |          1 | employees_name |            1 | last_name   | A         |        1518 |     NULL | NULL   |      | BTREE      |         |               |
-| employees |          1 | employees_name |            2 | first_name  | A         |      279014 |     NULL | NULL   |      | BTREE      |         |               |
-+-----------+------------+----------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
-3 rows in set (0.00 sec)
-```
+-- インデックス付与後
++----------+--------------------------------------------------------------------------------------------------------------------------------------------+----------+
+| event_id | sql_text                                                                                                                                   | time     |
++----------+--------------------------------------------------------------------------------------------------------------------------------------------+----------+
+|      114 | INSERT INTO employees (emp_no, first_name, last_name, birth_date, hire_date) VALUES (500002, 'kenji','tomita', '1915-11-30', '1958-05-01') | 0.017870 |
++----------+--------------------------------------------------------------------------------------------------------------------------------------------+----------+
 
-```shell
-mysql> DROP INDEX `employees_name` ON employees;
-Query OK, 0 rows affected (0.07 sec)
-Records: 0  Duplicates: 0  Warnings: 0
 ```
-
 ```shell
-mysql> INSERT INTO employees (emp_no, first_name, last_name, birth_date, hire_date) VALUES (500001, 'kenji','tomita', '1915-11-30', '1958-05-01');
-Query OK, 1 row affected (0.00 sec)
+-- インデックス付与前
++----------+--------------------------------------------------------------------------------------------------------------------------------------------+----------+
+| event_id | sql_text                                                                                                                                   | time     |
++----------+--------------------------------------------------------------------------------------------------------------------------------------------+----------+
+|      123 | INSERT INTO employees (emp_no, first_name, last_name, birth_date, hire_date) VALUES (500003, 'kenji','tomita', '1915-11-30', '1958-05-01') | 0.004350 |
++----------+--------------------------------------------------------------------------------------------------------------------------------------------+----------+
+
 ```
 
 **結果**  
+付与前と付与後を比較した時に、取得時間に約**4倍**差がある
+
 インデックスを作れば作るほど、INSERTが遅くなる
 1つインデックスを作るだけで、非常に大きな違いが生まれます。  
 insertのパフォーマンスを最適化するには、 インデックスの数を小さく保つ事が非常に重要です。  
@@ -222,6 +394,7 @@ INSERTがコミットされると、ターゲットテーブルの全インデ�
 - [drop indexについて](https://dev.mysql.com/doc/refman/5.6/ja/drop-index.html)
 - [insert, deleteについて](https://use-the-index-luke.com/ja/sql/dml/insert)
 - [インデックスについて](https://www.techscore.com/tech/sql/15_01)
+- [create indexについて](https://dev.mysql.com/doc/refman/5.6/ja/create-index.html)
 - ----
 ## 課題3 
 - もらった合計給与額が最も高い従業員の氏名と合計額を知りたい。
@@ -229,16 +402,20 @@ INSERTがコミットされると、ターゲットテーブルの全インデ�
 - 20代の従業員の男性と女性人の割合
 
 ----
-### 課題外
-ディスクにおいては、基本的なデータへのアクセス方法がある。　　
+<detail>
+    <summary>課題外</summary>
+
+### ディスクにおいては、基本的なデータへのアクセス方法がある。
 
 - シーケンシャルアクセス
 - ツリーインデックス
 
 **シーケンシャルアクセス**  
-テーブルスキャンはテーブルの全データを物理的な格納順序でシーケンシャルに読みだす。　　
+テーブルスキャンはテーブルの全データを物理的な格納順序でシーケンシャルに読みだす。
 削除された行を物理的にも削除するには、データベースのユーティリティやコマンドを実行するか、定期実行するよう設定する必要がある。  
 そのようなデータベースの再構成を行うとフルスキャンの性能が良くなる。
 
 **ツリーインデックス**  
 テーブルサイズが大きくなるにつれて、インデックスの木も深くなり、目的のデータを見つけるのに時間がかかるようになる。.
+
+</detail>
