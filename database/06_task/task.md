@@ -105,20 +105,21 @@ SQLのように範囲検索があるシステムで主に起きる問題
 
 ### DieryReadを再現するクエリを実装
 
-1. ユーザAの分離レベルを READ COMMITTEDに更新
+1. ユーザAの分離レベルを READ UNCOMMITTEDに更新
 ```shell
-mysql> set session transaction isolation level read committed;
+mysql> set session transaction isolation level read uncommitted;
 Query OK, 0 rows affected (0.00 sec)
 ```
 
 2. ユーザAの分離レベルが READ COMMITTEDだと確認
 ```shell
 mysql> SELECT @@GLOBAL.tx_isolation, @@tx_isolation;
-+-----------------------+----------------+
-| @@GLOBAL.tx_isolation | @@tx_isolation |
-+-----------------------+----------------+
-| REPEATABLE-READ       | READ-COMMITTED |
-+-----------------------+----------------+
++-----------------------+------------------+
+| @@GLOBAL.tx_isolation | @@tx_isolation   |
++-----------------------+------------------+
+| REPEATABLE-READ       | READ-UNCOMMITTED |
++-----------------------+------------------+
+
 1 row in set, 2 warnings (0.00 sec)
 ```
 
@@ -136,7 +137,7 @@ mysql> SELECT CONCAT(first_name, '', last_name) as full_name FROM employees WHER
 4. ユーザBでトランザクションクエリをたたく
 `start transaction`を叩くが、`commit`を叩かない
 ```shell
-mysql> start transaction;
+mysql> START TRANSACTION;
 Query OK, 0 rows affected (0.00 sec)
 ```
 ```shell
@@ -145,7 +146,7 @@ Query OK, 1 row affected (0.02 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
 ```
 
-5.ユーザAでデータを確認する  
+5.ユーザAでデータを確認
 ユーザBで`commit`を叩いてはないが、データが更新されるのを確認(Dirty Readを再現)
 ```shell
 mysql> SELECT CONCAT(first_name, '', last_name) as full_name FROM employees WHERE emp_no = 15000;
@@ -163,6 +164,69 @@ mysql> SELECT CONCAT(first_name, '', last_name) as full_name FROM employees WHER
 SQL標準で4段階あるトランザクションの分離レベルを最も低い「READ UNCOMMITTED」に設定すると発生する可能性がある。
 </details>
 
+### Non-repeatableReadを再現するクエリを実装
+
+1. ユーザAの分離レベルをREAD COMMITTEDに更新 
+```shell
+mysql> SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+Query OK, 0 rows affected (0.00 sec)
+
+``` 
+2. ユーザAの分離レベルが READ COMMITTEDだと確認
+```shell
+mysql> SELECT @@GLOBAL.tx_isolation, @@tx_isolation;
++-----------------------+----------------+
+| @@GLOBAL.tx_isolation | @@tx_isolation |
++-----------------------+----------------+
+| REPEATABLE-READ       | READ-COMMITTED |
++-----------------------+----------------+
+1 row in set, 2 warnings (0.00 sec)
+```
+
+3. ユーザBでトランザクションクエリをたたく  
+`start transaction`を叩くが、`commit`を叩かない
+```shell
+mysql> START TRANSACTION;
+Query OK, 0 rows affected (0.00 sec)
+```
+```shell
+mysql> UPDATE employees SET first_name = 'Update', last_name = 'Name' WHERE emp_no = 15002;
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+```
+
+4. ユーザAでDirty Readが発生しないことを確認 
+```shell
+mysql> SELECT CONCAT(first_name, ' ', last_name) as full_name FROM employees WHERE emp_no = 15002;
++---------------+
+| full_name     |
++---------------+
+| Kristen Rosch |
++---------------+
+1 row in set (0.00 sec)
+
+```
+
+5. ユーザBで`COMMIT`をたたく
+```shell
+mysql> COMMIT;
+Query OK, 0 rows affected (0.01 sec)
+
+```
+
+6. ユーザAでデータを確認  
+ユーザAで`COMMIT`していないのに、データが更新されているのを確認(Non-repeatable Readを再現)
+
+```shell
+mysql> SELECT CONCAT(first_name, ' ', last_name) as full_name FROM employees WHERE emp_no = 15002;
++-------------+
+| full_name   |
++-------------+
+| Update Name |
++-------------+
+1 row in set (0.00 sec)
+
+```
 <details>
     <summary>Non repeatable readについて</summary>
 同一のトランザクション内で値を複数回読み取ったときに、その結果が異なってしまう現象のことです。
