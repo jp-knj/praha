@@ -238,12 +238,72 @@ mysql> SELECT CONCAT(first_name, ' ', last_name) as full_name FROM employees WHE
 そうすれば Repeatable Read を使う必要もなく、Read Committed で十分となります。
 </details>
 
+### Phantom Readを再現するクエリを実装
+1. ユーザAの分離レベルをREAD COMMITTEDに更新
+```shell
+mysql> SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+Query OK, 0 rows affected (0.00 sec)
+```
+2. ユーザAの分離レベルが READ COMMITTEDだと確認
+```shell
+mysql> SELECT @@GLOBAL.tx_isolation, @@tx_isolation;
++-----------------------+----------------+
+| @@GLOBAL.tx_isolation | @@tx_isolation |
++-----------------------+----------------+
+| REPEATABLE-READ       | READ-COMMITTED |
++-----------------------+----------------+
+1 row in set, 2 warnings (0.00 sec)
+```
+3. insert する
+```shell
+mysql> insert employees values(999999, '9999-12-31', 'testFirstName', 'testLastName', 'M', '9999-12-31');
+Query OK, 1 row affected (0.00 sec)
+```
+
+ファントムリードが発生していることを確認
+```shell
+mysql> SELECT count(*) FROM employees;
++----------+
+| count(*) |
++----------+
+|   300028 |
++----------+
+1 row in set (0.23 sec)
+
+```
+
+```shell
+mysql> select count(*) from employees;
++----------+
+| count(*) |
++----------+
+|   300029 |
++----------+
+1 row in set (0.06 sec)
+```
+delete する
+```shell
+mysql> select count(*) from employees;
++----------+
+| count(*) |
++----------+
+|   300028 |
++----------+
+1 row in set (0.06 sec)
+
+
+```
+
+```shell
+mysql> delete from employees where emp_no = 999999;
+Query OK, 1 row affected (0.07 sec)
+
+```
 <details>
         <summary>Phantom Readについて</summary>
 あるトランザクションが読み出しを複数回行うと、その間に他のトランザクションが追加したデータが増えてしまう状態のこと。
 トランザクション分離レベルとして最も高い “SERIALIZABLE”（直列化可能）を指定する必要があるが、その分だけ性能は低くなるため、処理の特性やコストなどとの兼ね合いで完全に防ぐ必要があるか判断することになる。
 </details>
-
 
 
 **参考文献**
