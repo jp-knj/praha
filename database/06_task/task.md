@@ -103,6 +103,60 @@ SQLのように範囲検索があるシステムで主に起きる問題
 
 ## 課題2
 
+### DieryReadを再現するクエリを実装
+
+1. ユーザAの分離レベルを READ COMMITTEDに更新
+```shell
+mysql> set session transaction isolation level read committed;
+Query OK, 0 rows affected (0.00 sec)
+```
+
+2. ユーザAの分離レベルが READ COMMITTEDだと確認
+```shell
+mysql> SELECT @@GLOBAL.tx_isolation, @@tx_isolation;
++-----------------------+----------------+
+| @@GLOBAL.tx_isolation | @@tx_isolation |
++-----------------------+----------------+
+| REPEATABLE-READ       | READ-COMMITTED |
++-----------------------+----------------+
+1 row in set, 2 warnings (0.00 sec)
+```
+
+3. ユーザAで変更されるデータを確認
+```shell
+mysql> SELECT CONCAT(first_name, '', last_name) as full_name FROM employees WHERE emp_no = 15000;
++--------------+
+| full_name    |
++--------------+
+| ThanasisBahi |
++--------------+
+1 row in set (0.00 sec)
+
+```
+4. ユーザBでトランザクションクエリをたたく
+`start transaction`を叩くが、`commit`を叩かない
+```shell
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+```
+```shell
+mysql> UPDATE employees set first_name = 'Updated', last_name = 'Name'  WHERE emp_no = 15000;
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+```
+
+5.ユーザAでデータを確認する  
+ユーザBで`commit`を叩いてはないが、データが更新されるのを確認(Dirty Readを再現)
+```shell
+mysql> SELECT CONCAT(first_name, '', last_name) as full_name FROM employees WHERE emp_no = 15000;
++-------------+
+| full_name   |
++-------------+
+| UpdatedName |
++-------------+
+1 row in set (0.00 sec)
+```
+
 <details>
     <summary>Dirty Readについて</summary>
 あるトランザクションによって変更されているコミットを終えていないデータが、他のトランザクションによって読み込まれている状態のこと。
@@ -130,3 +184,4 @@ SQL標準で4段階あるトランザクションの分離レベルを最も低�
 
 **参考文献**
 - [ファントムリードについて](https://e-words.jp/w/%E3%83%95%E3%82%A1%E3%83%B3%E3%83%88%E3%83%A0%E3%83%AA%E3%83%BC%E3%83%89.html)
+- [SET TRANSACTIONについて](https://dev.mysql.com/doc/refman/5.6/ja/set-transaction.html)
