@@ -254,13 +254,22 @@ mysql> SELECT @@GLOBAL.tx_isolation, @@tx_isolation;
 +-----------------------+----------------+
 1 row in set, 2 warnings (0.00 sec)
 ```
-3. insert する
+3. ユーザAで行を追加し、`COMMIT`
 ```shell
-mysql> insert employees values(999999, '9999-12-31', 'testFirstName', 'testLastName', 'M', '9999-12-31');
+mysql> START TRANSACTION; 
+Query OK, 0 rows affected (0.00 sec)
+```
+```shell
+mysql> INSERT employees VALUE(999999, '9999-12-31', 'testFirstName', 'testLastName', 'M', '9999-12-31');
+
 Query OK, 1 row affected (0.00 sec)
 ```
+```shell
+mysql> COMMIT; 
+Query OK, 0 rows affected (0.00 sec)
+```
 
-ファントムリードが発生していることを確認
+4. ユーザBでデータの更新があるかを確認（ユーザAのCOMMIT前）
 ```shell
 mysql> SELECT count(*) FROM employees;
 +----------+
@@ -269,35 +278,17 @@ mysql> SELECT count(*) FROM employees;
 |   300028 |
 +----------+
 1 row in set (0.23 sec)
-
 ```
 
+5. ユーザBでユーザAが追加した行を読み込まれていることを確認（ファントムリードを再現）
 ```shell
-mysql> select count(*) from employees;
+mysql> SELECT count(*) FROM employees;
 +----------+
 | count(*) |
 +----------+
 |   300029 |
 +----------+
 1 row in set (0.06 sec)
-```
-delete する
-```shell
-mysql> select count(*) from employees;
-+----------+
-| count(*) |
-+----------+
-|   300028 |
-+----------+
-1 row in set (0.06 sec)
-
-
-```
-
-```shell
-mysql> delete from employees where emp_no = 999999;
-Query OK, 1 row affected (0.07 sec)
-
 ```
 <details>
         <summary>Phantom Readについて</summary>
