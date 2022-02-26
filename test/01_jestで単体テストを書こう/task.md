@@ -5,58 +5,68 @@
 
 <details>
     <summary>assertionとは？</summary>
-    an assertion is a boolean expression written for evaluating the operation of a specific portion of your software.  
-    think of it as a normal phrase you could say out lound to explain your intentions.
+    テスト結果が期待値と同じであるのかの真偽判定を行い、意図と異なる値が検出された場合、テストを失敗させる
 </details>
 
 <details>
     <summary>code coverageとは？</summary>
-    an assertion is a boolean expression written for evaluating the operation of a specific portion of your software.  
-    think of it as a normal phrase you could say out lound to explain your intentions.
+    テスト対象となるロジック全体の中で、テストが行われた部分が占める割合
 </details>
 
 <details>
     <summary>ライブラリとは？</summary>
-    an assertion is a boolean expression written for evaluating the operation of a specific portion of your software.  
-    think of it as a normal phrase you could say out lound to explain your intentions.
+**JavaScriptのテストツールには種類がある**
+- テストランナー
+- テストフレームワーク
+- アサーションライブラリ
+- DOMテスティングライブラリ
+- E2Eライブラリ
 </details>
 
 <details>
     <summary>モックとは？</summary>
-    an assertion is a boolean expression written for evaluating the operation of a specific portion of your software.  
-    think of it as a normal phrase you could say out lound to explain your intentions.
-</details>
+テスト対象が依存コンポーネントを呼び出した時に取得できる値を用意し、さらに呼び出した時に与えた値を記録(スタブとモックの機能を保持)
 
+テスト対象が既に実装された依存コンポーネントを呼び出した値や回数を検証するテスト
+</details>
 
 <details>
     <summary>モンキーパッチとは？</summary>
-    an assertion is a boolean expression written for evaluating the operation of a specific portion of your software.  
-    think of it as a normal phrase you could say out lound to explain your intentions.
+    システムソフトウェアを補完するために、プログラムをその時その場の実行範囲で拡張または修正するテクニック。
+
+**参考文献**
+- [モンキーパンチングについて](https://bit.ly/3pibWQ4)
 </details>
 
 <details>
     <summary>spyとは？</summary>
-とは
+テスト対象が依存コンポーネントを呼び出したときに取得できる値を用意し、さらに呼び出したときに与えた値を記録する。（スタブとモックの機能を持つ）
+
+テスト対象が既に実装された依存コンポーネントを呼び出した値や回数を検証するテスト
 </details>
+
 
 <details>
     <summary>stubとは？</summary>
+テスト対象が依存コンポーネントを呼び出した時に取得できる値を用意。
+
+依存コンポーネントから取得できる値が変化した時、テスト対象の挙動がどう変化する確認するテスト。
 </details>
 
 <details>
     <summary>test doubleとは？</summary>
-</details>
+テストダブルとは、テスト実行時に、テスト対象が依存しているコンポーネントと置換
 
-<details>
-    <summary>もし、単体テストごとに処理を記述したかった場合は</summary>
-</details>
-
-<details>
-    <summary>matcherとは？</summary>
+- スタブ
+- モック
+- スパイ　など
 </details>
 
 <details>
     <summary>describeとは？</summary>
+describeは、いくつかの関連するテストをまとめたブロックを作成  
+複数のテストをdescribeにまとめることで、テスト結果がグループごとに出力  
+テストの数が増えてくると、describeでテストをグループに分ける事で管理が容易
 </details>
 
 ## 課題２
