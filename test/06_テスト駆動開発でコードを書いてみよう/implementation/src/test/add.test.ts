@@ -28,4 +28,10 @@ describe('add関数を実行した場合', () => {
       // expect(() => add(...charsOfInvalidArgment)).toThrowError();
     });
   });
+
+  describe('計算結果が1000 超える値(1,999)を渡したとき', () => {
+    it('「too big」の文字列を返すこと', () => {
+      expect(add(250, 250, 250, 250)).toBe('too big');
+    });
+  });
 });
