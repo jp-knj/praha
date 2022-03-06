@@ -27,12 +27,12 @@ export const asyncSumOfArraySometimesZero = (
 
 export const getFirstNameThrowIfLong = async (
     maxNameLength: number,
-    nameApiSerivce: NameApiService
+    getFirstName: NameApiService["getFirstName"]
 ): Promise<string> => {
-    const firstName = await nameApiSerivce.getFirstName();
+    const firstName = await getFirstName();
 
     if (firstName.length > maxNameLength) {
-        throw new Error('first_name too long');
+        throw new Error("first_name too long");
     }
     return firstName;
 };

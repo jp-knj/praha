@@ -1,29 +1,21 @@
-import axios from 'axios';
-
 import {
     sumOfArray,
     asyncSumOfArray,
     asyncSumOfArraySometimesZero,
     getFirstNameThrowIfLong,
 } from '../functions';
-import { NameApiService } from '../nameApiService';
+import { NameApiService } from "../nameApiService"
+import { DatabaseMock } from "../util"
 
 describe('sumOfArray関数を実行した場合で', () => {
     describe('数値の配列を渡した時', () => {
         it('numberの合計値を返すこと', () => {
-            expect(sumOfArray([1, 2])).toBe(3);
             expect(sumOfArray([1, 2, 3])).toBe(6);
         });
     });
 
     describe('空の配列を渡した時', () => {
-        it('例外が発生すること', () => {
-            expect(() => sumOfArray([])).toThrow();
-        });
-        it('型エラーが発生すること', () => {
-            expect(() => sumOfArray([])).toThrow(TypeError);
-        });
-        it('文言は Reduce of empty array with no initial value が発生すること', () => {
+        it('エラーでReduce of empty array with no initial value が発生すること', () => {
             expect(() => sumOfArray([])).toThrow(
                 'Reduce of empty array with no initial value'
             );
@@ -43,30 +35,13 @@ describe('sumOfArray関数を実行した場合で', () => {
 describe("asyncSumOfArray関数を非同期で実行した場合で", () => {
     describe('数値の配列を渡した時', () => {
         it('数値の合計値を返すこと', async () => {
-            await expect(asyncSumOfArray([1, 2])).resolves.toBe(3);
             await expect(asyncSumOfArray([1, 2, 3])).resolves.toBe(6);
         });
     });
 
     describe('空の配列を渡した時', () => {
-        it('例外が発生すること', async () => {
-            await expect(() => asyncSumOfArray([])).rejects.toThrow();
-            await expect(() => asyncSumOfArray([])).rejects.toThrow(TypeError);
+        it('エラーでReduce of empty array with no initial value が発生すること', async () => {
             await expect(() => asyncSumOfArray([])).rejects.toThrow(
-                'Reduce of empty array with no initial value'
-            );
-        });
-    });
-
-    describe('空の配列を渡した時', () => {
-        it('例外が発生すること', async () => {
-            await expect(() => sumOfArray([])).toThrow();
-        });
-        it('型エラーが発生すること', async () => {
-            await expect(() => sumOfArray([])).toThrow(TypeError);
-        });
-        it('文言は Reduce of empty array with no initial value が発生すること', async () => {
-            await expect(() => sumOfArray([])).toThrow(
                 'Reduce of empty array with no initial value'
             );
         });
@@ -84,8 +59,12 @@ describe('asyncSumOfArraySometimeZero関数を実行した場合で', () => {
         it('numberの合計値を返すこと', () => {
             asyncSumOfArraySometimesZero([1, 2], databaseMockSpy).then(
                 async (data) => {
-                    await expect(data).toBe(3);
-                    await expect(databaseMockSpy.save).toBeCalledTimes(1);
+                    await Promise.all(
+                        [
+                            expect(data).toBe(3),
+                            expect(databaseMockSpy.save).toBeCalledTimes(1)
+                        ]
+                    )
                 }
             );
         });
@@ -114,14 +93,34 @@ describe('asyncSumOfArraySometimeZero関数を実行した場合で', () => {
     });
 });
 
-jest.mock('../NameApiService');
-describe('getFirstNameThrowIfLongを実行した場合で', () => {
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-    describe('nameApiSerivceから返されるfirstNameの文字数がMAX_LENGTH(4)以下の時', () => {
-    });
+describe("getFirstNameThrowIfLong() は NameApiService から firstName を取得する", () => {
+    let mockGetFirstNameA: NameApiService["getFirstName"]
+    beforeEach(() => {
+        mockGetFirstNameA = jest.fn(async () => "A")
+    })
 
-    describe('nameApiSerivceから返されるfirstNameの文字数がMAX_LENGTH(4)以上の時', () => {
-    });
-});
+    describe("firstName.length <= maxNameLength の場合 firstNameを返す", () => {
+        it(`maxNameLength = 1, firstName = "A" の場合 "A" を返す`, async () => {
+            await expect(getFirstNameThrowIfLong(1, mockGetFirstNameA)).resolves.toBe(
+                "A"
+            )
+        })
+    })
+
+    describe("maxNameLength < firstName.length の場合 エラーになる", () => {
+        it(`maxNameLength = 0, firstName = "A" の場合 エラーになる`, async () => {
+            await expect(
+                getFirstNameThrowIfLong(0, mockGetFirstNameA)
+            ).rejects.toThrowError()
+        })
+    })
+
+    it("NameApiServiceからの取得に失敗した場合 エラーになる", async () => {
+        const mockGetFirstNameAlwaysThrowError = jest.fn(async () => {
+            throw new Error()
+        })
+        await expect(
+            getFirstNameThrowIfLong(1, mockGetFirstNameAlwaysThrowError)
+        ).rejects.toThrowError()
+    })
+})
