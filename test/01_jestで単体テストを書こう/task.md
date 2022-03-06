@@ -28,6 +28,18 @@
 テスト対象が依存コンポーネントを呼び出した時に取得できる値を用意し、さらに呼び出した時に与えた値を記録(スタブとモックの機能を保持)
 
 テスト対象が既に実装された依存コンポーネントを呼び出した値や回数を検証するテスト
+
+自作した`MockFn`
+```javascript
+function fn(impl = () => {}) {
+  const mockFn = (...args) => {
+    mockFn.mock.calls.push(args)
+    return impl(...args)
+  }
+  mockFn.mock = {calls: []}
+  return mockFn
+}
+```
 </details>
 
 <details>
@@ -70,3 +82,18 @@ describeは、いくつかの関連するテストをまとめたブロックを
 </details>
 
 ## 課題２
+
+
+## 課題３
+### カバレッジ100％のテストを実装できなかった理由
+密結合な依存が発生していたため。
+
+### DIとは？
+
+### モジュール同士の結合度はどうなるのか？
+
+### Property Based Testing（プロパティベースのテスト)とは？
+
+## 課題４
+
+## 任意課題
