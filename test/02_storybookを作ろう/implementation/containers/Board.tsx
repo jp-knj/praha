@@ -8,7 +8,7 @@ function Board(){
     const [currentPlayer, setCurrentPlayer] = useState<'X'| 'O'>(
         Math.round(Math.random()* 1) === 1 ? 'X': 'O'
     )
-    function setSquareValue(index: number){
+    const setSquareValue = (index: number) => {
         const newData: unknown[] = squares.map((val, i) => {
             if(i === index){
                 return currentPlayer;
@@ -18,6 +18,13 @@ function Board(){
         setSquares(newData)
         setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X')
     }
+
+    const resetTicTacToe = () => {
+        setSquares(Array(9).fill(null))
+        setWinner(null)
+        setCurrentPlayer(Math.round(Math.random() * 1) === 1 ? "X" : "O")
+    }
+
     return (
         <div>
             <p>Hey {currentPlayer}, its your turn</p>
@@ -35,6 +42,7 @@ function Board(){
                         );
                     })}
             </div>
+            <button className='reset' onClick={resetTicTacToe}>Reset</button>
         </div>
     )
 }
