@@ -7,7 +7,7 @@ type Props = {
 }
 
 function Square({onClick, value, winner}:Props):JSX.Element {
-    const square = !value ? <button onClick={onClick} disabled={Boolean(winner)} /> : <button>{value}</button>;
+    const square = !value ? <button className="square" onClick={onClick} disabled={Boolean(winner)} /> : <button className={`square square_${value.toLocaleLowerCase()}`} disabled>{value}</button>;
     return square;
 }
 
