@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Player } from '../models/Player'
+import Button from '../ui/Button'
 import Square from '../ui/Square'
 
 function Board(){
@@ -81,7 +82,7 @@ function Board(){
                         );
                     })}
             </div>
-            <button className='reset' onClick={resetTicTacToe}>Reset</button>
+            <Button onClick={resetTicTacToe}/>
         </div>
     )
 }
