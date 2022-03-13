@@ -85,8 +85,5 @@ function Board(){
         </div>
     )
 }
-export default Board;
 
-function i(_: any, i: any): import("react").ReactNode {
-    throw new Error('Function not implemented.');
-}
+export default Board;
