@@ -1,4 +1,4 @@
-type Player = 'X'| 'O' | null
+import { Player } from '../models/Player'
 
 type Props = {
     winner: Player
