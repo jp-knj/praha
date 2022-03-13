@@ -1,0 +1,18 @@
+import { Canvas, Meta, Story } from '@storybook/addon-docs'
+import Board from './Board'
+import '../styles/globals.css'
+
+<Meta title="MDX/Board" component={Board}/>
+
+export const Template = (args) => <Board {...args} />;
+
+# Board
+
+## Types
+<Canvas>
+    <Story
+        name="Board"
+        args={{}}>
+        {Template.bind()}
+    </Story>
+</Canvas>
