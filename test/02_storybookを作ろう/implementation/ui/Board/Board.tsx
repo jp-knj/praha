@@ -4,7 +4,7 @@ import Square from "../../ui/Square";
 import {useBoard } from "./useBoard";
 
 function Board() {
-  const { winner, squares, currentPlayer, calculateWinner, setSquareValue, resetTicTacToe } = useBoard();
+  const { winner, squares, currentPlayer, calculateWinner, insertMarker, handleResetGame } = useBoard();
   return (
     <div>
       {!winner && <p>Hey {currentPlayer}, it's your turn</p>}
@@ -20,13 +20,13 @@ function Board() {
               <Square
                 winner={winner}
                 key={i}
-                onClick={() => setSquareValue(i)}
+                onClick={() => insertMarker(i)}
                 value={squares[i]}
               />
             );
           })}
       </div>
-      <Button onClick={resetTicTacToe} />
+      <Button onClick={handleResetGame} />
     </div>
   );
 }

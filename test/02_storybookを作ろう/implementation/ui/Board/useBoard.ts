@@ -8,8 +8,8 @@ export type UseBoardResult = {
   squares: Player[]
   currentPlayer: Maker
   calculateWinner: (squares: Player[]) => Player|null
-  setSquareValue:(index: number) => void
-  resetTicTacToe: () => void
+  insertMarker:(index: number) => void
+  handleResetGame: () => void
 }
 export const useBoard = ():UseBoardResult => {
   const [winner, setWinner] = useState<Player>(null);
@@ -41,7 +41,7 @@ export const useBoard = ():UseBoardResult => {
     return null;
   };
 
-  const setSquareValue = (index: number) => {
+  const insertMarker = (index: number) => {
     const newData: unknown[] = squares.map((val, i) => {
       if (i === index) {
         return currentPlayer;
@@ -52,7 +52,7 @@ export const useBoard = ():UseBoardResult => {
     setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
   };
 
-  const resetTicTacToe = () => {
+  const handleResetGame = () => {
     setSquares(Array(9).fill(null));
     setWinner(null);
     setCurrentPlayer(Math.round(Math.random() * 1) === 1 ? "X" : "O");
@@ -74,7 +74,7 @@ export const useBoard = ():UseBoardResult => {
     squares,
     currentPlayer,
     calculateWinner,
-    setSquareValue,
-    resetTicTacToe
+    insertMarker,
+    handleResetGame
   }
 }
