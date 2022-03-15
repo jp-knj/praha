@@ -1,5 +1,5 @@
 import { useEffect, useState} from 'react'
-import { Player } from '../models/Player'
+import { Player } from '../../models/Player'
 
 export type UseBoardResult = {
   winner: Player

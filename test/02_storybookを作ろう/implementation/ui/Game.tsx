@@ -1,6 +1,6 @@
 import styles from "../styles/Home.module.css";
 
-import Board from "../ui/Board";
+import Board from "../ui/Board/Board";
 
 function Game() {
   return (

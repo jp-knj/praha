@@ -1,7 +1,8 @@
-import { Player } from "../models/Player";
-import Button from "../ui/Button";
-import Square from "../ui/Square";
-import {useBoard } from "../features/useBoard";
+import { Player } from "../../models/Player";
+import Button from "../../ui/Button";
+import Square from "../../ui/Square";
+import {useBoard } from "./useBoard";
+
 function Board() {
   const { winner, squares, currentPlayer, calculateWinner, setSquareValue, resetTicTacToe } = useBoard();
   return (
