@@ -1,9 +1,13 @@
 type Props = {
-    onClick: () => void;
-}
+  onClick: () => void;
+};
 
-function Button({onClick}:Props):JSX.Element {
-    return <button className='reset' onClick={onClick}>Reset</button>
+function Button({ onClick }: Props): JSX.Element {
+  return (
+    <button className="reset" onClick={onClick}>
+      Reset
+    </button>
+  );
 }
 
 export default Button;

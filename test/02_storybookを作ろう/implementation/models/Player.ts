@@ -1,1 +1,1 @@
-export type Player = 'X'| 'O' | 'BOTH' | null
+export type Player = "X" | "O" | "BOTH" | null;

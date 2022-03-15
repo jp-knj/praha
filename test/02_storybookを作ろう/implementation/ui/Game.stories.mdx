@@ -1,17 +1,17 @@
-import { Canvas, Meta, Story } from '@storybook/addon-docs'
-import Game from './Game'
-import '../styles/globals.css'
+import { Canvas, Meta, Story } from "@storybook/addon-docs";
+import Game from "./Game";
+import "../styles/globals.css";
 
-<Meta title="MDX/Game" component={Game}/>
+<Meta title="MDX/Game" component={Game} />
 
 export const Template = (args) => <Game {...args} />;
 
 # Game
+
 ## Types
+
 <Canvas>
-    <Story
-        name="Game"
-        args={{}}>
-        {Template.bind()}
-    </Story>
+  <Story name="Game" args={{}}>
+    {Template.bind()}
+  </Story>
 </Canvas>
