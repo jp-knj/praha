@@ -1,8 +1,15 @@
 import { Canvas, Meta, Story } from "@storybook/addon-docs";
+import { action } from "@storybook/addon-actions"
 import Square from "./Square";
 import "../styles/globals.css";
 
-<Meta title="MDX/Square" component={Square} />
+
+<Meta title="MDX/Square" component={Square}
+      parameters={{
+        actions: {
+          handles: ['mouseover', 'click .btn'],
+        },
+      }}  />
 
 export const Template = (args) => <Square {...args} />;
 
@@ -15,11 +22,6 @@ export const Template = (args) => <Square {...args} />;
 <Canvas>
   <Story
     name="cross"
-    args={{
-      winner: "X",
-      value: "X",
-      onClick: () => null,
-    }}
   >
     {Template.bind()}
   </Story>
