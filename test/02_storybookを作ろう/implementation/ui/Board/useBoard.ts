@@ -1,10 +1,12 @@
 import { useEffect, useState} from 'react'
 import { Player } from '../../models/Player'
 
+type Maker = "X"|"O"
+
 export type UseBoardResult = {
   winner: Player
   squares: Player[]
-  currentPlayer: "X"|"O"
+  currentPlayer: Maker
   calculateWinner: (squares: Player[]) => Player|null
   setSquareValue:(index: number) => void
   resetTicTacToe: () => void
@@ -12,7 +14,7 @@ export type UseBoardResult = {
 export const useBoard = ():UseBoardResult => {
   const [winner, setWinner] = useState<Player>(null);
   const [squares, setSquares] = useState(Array(9).fill(null));
-  const [currentPlayer, setCurrentPlayer] = useState<"X" | "O">(
+  const [currentPlayer, setCurrentPlayer] = useState<Maker>(
     Math.round(Math.random() * 1) === 1 ? "X" : "O"
   );
   const calculateWinner = (squares: Player[]):Player|null => {
