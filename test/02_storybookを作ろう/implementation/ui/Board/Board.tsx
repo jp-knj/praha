@@ -21,7 +21,7 @@ function Board() {
                 winner={winner}
                 key={i}
                 onClick={() => insertMarker(i)}
-                value={squares[i]}
+                marker={squares[i]}
               />
             );
           })}
