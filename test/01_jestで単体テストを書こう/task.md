@@ -122,5 +122,17 @@ describeは、いくつかの関連するテストをまとめたブロックを
 ## 課題４
 [課題内容](https://github.com/jp-knj/praha/blob/main/test/01_jest%E3%81%A7%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88%E3%82%92%E6%9B%B8%E3%81%93%E3%81%86/implementation/error-middleware.ts)
 
+1. このオプションはどんな役割をもつでしょうか？
+- --changedSince 
+- --onlyChanged
+
+2. この設定でどんなことが起こるでしょうか？
+```javascript
+module.exports = {
+  cacheDirectory: '/tmp/jest',
+  ...
+}
+```
+3. --maxWorkers オプションはどんな役割をもつでしょうか？?
 ## 任意課題
 [Type Challengeの回答](https://zenn.dev/ignorant_kenji/scraps/52f2fc03f42e6b)
