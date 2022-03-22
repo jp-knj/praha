@@ -115,8 +115,8 @@ describeは、いくつかの関連するテストをまとめたブロックを
 これは、定型的なテストを減らすために非常に効率的であることを証明するために
 追加のテストのレイヤーを提供する
 
-参考文献
-[Property based testingについて](https://medium.com/criteo-engineering/introduction-to-property-based-testing-f5236229d237)
+参考文献  
+[Property based testingについて](https://medium.com/criteo-engineering/introduction-to-property-based-testing-f5236229d237)  
 [ハンズオンProperty based testing](https://github.com/dubzzz/fast-check/blob/main/documentation/HandsOnPropertyBased.md)
 
 ## 課題４
