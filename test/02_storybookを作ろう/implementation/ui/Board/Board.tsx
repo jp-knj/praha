@@ -7,11 +7,7 @@ function Board() {
   const { winner, squares, currentPlayer, calculateWinner, insertMarker, handleResetGame } = useBoard();
   return (
     <div>
-      {!winner && <p>Hey {currentPlayer}, it's your turn</p>}
-      {winner && winner !== "BOTH" && <p>Congratulations {winner}</p>}
-      {winner && winner === "BOTH" && (
-        <p>Congratulations you're both winners</p>
-      )}
+
       <div className="grid">
         {Array(9)
           .fill(null)

@@ -1,48 +1,49 @@
-import { useEffect, useState} from 'react'
+import { useState, useMemo } from 'react';
 import { Player } from '../../models/Player'
 
 type Maker = "X"|"O"
-
+type Board = ReadonlyArray<number[]>
 export type UseBoardResult = {
   winner: Player
-  squares: Player[]
+  squares: ReadonlyArray<Player>
   currentPlayer: Maker
-  calculateWinner: (squares: Player[]) => Player|null
   insertMarker:(index: number) => void
   handleResetGame: () => void
 }
-export const useBoard = ():UseBoardResult => {
+export const useBoard = (initialValues = Array(9).fill('')):UseBoardResult => {
+  const [isPlayerNext, setIsPlayerNext] = useState<boolean>(false);
   const [winner, setWinner] = useState<Player>(null);
-  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [squares, setSquares] = useState<Maker[]>(initialValues);
   const [currentPlayer, setCurrentPlayer] = useState<Maker>(
     Math.round(Math.random() * 1) === 1 ? "X" : "O"
   );
-  const calculateWinner = (squares: Player[]):Player|null => {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [2, 4, 6],
-    ];
 
-    for (let i = 0; i < lines.length; i++) {
-      const [a, b, c] = lines[i];
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  const isWinner = (values: number[]) => {
+    for (const [i, j, k] of lines) {
       if (
-        squares[a] &&
-        squares[a] === squares[b] &&
-        squares[a] === squares[c]
-      ) {
-        return squares[a];
+        values[i]
+        && values[i] === values[j]
+        && values[j] === values[k]) {
+        return true;
       }
     }
-    return null;
+    return false;
   };
 
+
   const insertMarker = (index: number) => {
-    const newData: unknown[] = squares.map((val, i) => {
+    const newData: Maker[] = squares.map((val, i) => {
       if (i === index) {
         return currentPlayer;
       }
@@ -58,22 +59,10 @@ export const useBoard = ():UseBoardResult => {
     setCurrentPlayer(Math.round(Math.random() * 1) === 1 ? "X" : "O");
   };
 
-  useEffect(() => {
-    const w = calculateWinner(squares);
-    if (w) {
-      setWinner(w);
-    }
-
-    if (!w && !squares.filter((square) => !square).length) {
-      setWinner("BOTH");
-    }
-  });
-
   return {
     winner,
     squares,
     currentPlayer,
-    calculateWinner,
     insertMarker,
     handleResetGame
   }
