@@ -3,6 +3,12 @@ import { Player } from '../../models/Player'
 
 type Maker = "X"|"O"
 type Board = ReadonlyArray<number[]>
+
+type UseBoardProps = {
+  initialValues: string[]
+  initialPlayer: Maker
+  initialWinner: string
+}
 export type UseBoardResult = {
   winner: Player
   squares: ReadonlyArray<Player>
@@ -10,13 +16,11 @@ export type UseBoardResult = {
   insertMarker:(index: number) => void
   handleResetGame: () => void
 }
-export const useBoard = (initialValues = Array(9).fill('')):UseBoardResult => {
+export const useBoard = ({initialValues = Array(9).fill(''), initialPlayer = 'O', initialWinner = ''}:UseBoardProps):UseBoardResult => {
   const [isPlayerNext, setIsPlayerNext] = useState<boolean>(false);
-  const [winner, setWinner] = useState<Player>(null);
-  const [squares, setSquares] = useState<Maker[]>(initialValues);
-  const [currentPlayer, setCurrentPlayer] = useState<Maker>(
-    Math.round(Math.random() * 1) === 1 ? "X" : "O"
-  );
+  const [winner, setWinner] = useState<string>(initialWinner);
+  const [board, setBoard] = useState<string[]>(initialValues);
+  const [player, setPlayer] = useState<Maker>(initialPlayer);
 
   const lines = [
     [0, 1, 2],
