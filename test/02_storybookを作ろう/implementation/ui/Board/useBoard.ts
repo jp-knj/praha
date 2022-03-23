@@ -5,21 +5,21 @@ type Maker = "X"|"O"
 type Board = ReadonlyArray<number[]>
 
 type UseBoardProps = {
-  initialValues: string[]
+  initialValues: any[]
   initialPlayer: Maker
   initialWinner: string
 }
 export type UseBoardResult = {
-  winner: Player
-  squares: ReadonlyArray<Player>
-  currentPlayer: Maker
-  insertMarker:(index: number) => void
-  handleResetGame: () => void
+  winner: string;
+  player: string;
+  boards: any[];
+  handlePlayClick:(index: number) => void
+  handleResetClick: () => void
 }
-export const useBoard = ({initialValues = Array(9).fill(''), initialPlayer = 'O', initialWinner = ''}:UseBoardProps):UseBoardResult => {
+export const useBoard = ({initialValues = Array(9).fill(null), initialPlayer = 'O', initialWinner = ''}:UseBoardProps):UseBoardResult => {
   const [isPlayerNext, setIsPlayerNext] = useState<boolean>(false);
   const [winner, setWinner] = useState<string>(initialWinner);
-  const [board, setBoard] = useState<string[]>(initialValues);
+  const [boards, setBoards] = useState<any[]>(initialValues);
   const [player, setPlayer] = useState<Maker>(initialPlayer);
 
   const lines = [
@@ -45,29 +45,31 @@ export const useBoard = ({initialValues = Array(9).fill(''), initialPlayer = 'O'
     return false;
   };
 
+  useMemo(() => {
+    if (isWinner(boards)) {
+      setWinner(player);
+      return;
+    }
+    setPlayer(player === 'O' ? 'X' : 'O');
+  }, [boards]);
 
-  const insertMarker = (index: number) => {
-    const newData: Maker[] = squares.map((val, i) => {
-      if (i === index) {
-        return currentPlayer;
-      }
-      return val;
-    });
-    setSquares(newData);
-    setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
+  const handlePlayClick = (index: number) => {
+    if (winner) return;
+    if (boards[index]) return;
+    setBoards(prevBoards => prevBoards.map((board, _index) => (_index === index ? player: board)));
   };
 
-  const handleResetGame = () => {
-    setSquares(Array(9).fill(null));
-    setWinner(null);
-    setCurrentPlayer(Math.round(Math.random() * 1) === 1 ? "X" : "O");
+  const handleResetClick = () => {
+    setBoards(initialValues);
+    setPlayer(initialPlayer);
+    setWinner(initialWinner);
   };
 
   return {
     winner,
-    squares,
-    currentPlayer,
-    insertMarker,
-    handleResetGame
+    player,
+    boards,
+    handlePlayClick,
+    handleResetClick
   }
 }
