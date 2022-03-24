@@ -1,10 +1,8 @@
 # storybookを作ろう
 ## 課題1
+[チュートリアル](https://reactjs.org/tutorial/tutorial.html)
 
 ## 課題2
-- [ ] install storybook
-- [ ] create story each components
-- [ ] make triagle components and insert them to board
 
 ## 課題3
 ### Storybookとは？

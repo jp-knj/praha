@@ -9,15 +9,15 @@ type UseBoardProps = {
   initialPlayer: Maker
   initialWinner: string
 }
-export type UseBoardResult = {
-  winner: string;
-  player: string;
-  boards: any[];
-  handlePlayClick:(index: number) => void
+export type UseBoardResult = [
+  winner: string,
+  player: string,
+  boards: any[],
+  handlePlayClick:(index: number) => void,
   handleResetClick: () => void
-}
-export const useBoard = ({initialValues = Array(9).fill(null), initialPlayer = 'O', initialWinner = ''}:UseBoardProps):UseBoardResult => {
-  const [isPlayerNext, setIsPlayerNext] = useState<boolean>(false);
+];
+
+export const useBoard = ({ initialValues, initialPlayer, initialWinner }: UseBoardProps):UseBoardResult => {
   const [winner, setWinner] = useState<string>(initialWinner);
   const [boards, setBoards] = useState<any[]>(initialValues);
   const [player, setPlayer] = useState<Maker>(initialPlayer);
@@ -65,11 +65,11 @@ export const useBoard = ({initialValues = Array(9).fill(null), initialPlayer = '
     setWinner(initialWinner);
   };
 
-  return {
+  return [
     winner,
     player,
     boards,
     handlePlayClick,
     handleResetClick
-  }
+  ]
 }
