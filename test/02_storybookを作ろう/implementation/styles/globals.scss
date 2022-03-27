@@ -1,0 +1,17 @@
+* {
+  box-sizing: border-box;
+
+  &:focus {
+    outline: unset;
+  }
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Mali", cursive;
+  color: #333;
+  background: rgba(#d3cce3, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

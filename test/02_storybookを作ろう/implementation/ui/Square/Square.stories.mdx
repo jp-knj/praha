@@ -1,0 +1,40 @@
+import { Canvas, Meta, Story } from "@storybook/addon-docs";
+import Square from "./Square";
+
+<Meta title="MDX/Square" component={Square} />
+
+# Square
+With `MDX`, we can define a story for `Square` right in the middle of our Markdown documentation.
+
+#### cross
+<Canvas>
+  <Story name="cross">
+    <Square
+      index={1}
+      onClick={() => null}
+      marker="X"
+    />
+  </Story>
+</Canvas>
+
+#### circle
+<Canvas>
+  <Story name="circle">
+    <Square
+      index={1}
+      onClick={() => null}
+      marker="O"
+    />
+  </Story>
+</Canvas>
+
+#### triangle
+<Canvas>
+  <Story name="triangle">
+    <Square
+      index={1}
+      onClick={() => null}
+      marker="△"
+    />
+  </Story>
+</Canvas>
