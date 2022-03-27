@@ -65,6 +65,14 @@ export const useBoard = ({ initialValues, initialPlayer, initialWinner }: UseBoa
     setWinner(initialWinner);
   };
 
+  const renderStatus = () => {
+    return (
+      <h3>
+        Player: {player}
+        { winner && ` | Winner: ${winner}` }
+    </h3>
+    )
+  };
   return [
     winner,
     player,
