@@ -3,14 +3,17 @@ import { Board } from "./Board";
 
 <Meta title="MDX/Board" component={Board} />
 
-export const Template = (args) => <Board {...args} />;
-
 # Board
-
-## Types
+With `MDX`, we can define a story for `Board` right in the middle of our Markdown documentation.
 
 <Canvas>
-  <Story name="Board" args={{}}>
-    {Template.bind()}
+  <Story name="board">
+    <Board
+      winner='X'
+      player='X'
+      boards={Array(9).fill("△")}
+      handlePlayClick={() => null}
+      renderStatus={() => <></>}
+    />
   </Story>
 </Canvas>
