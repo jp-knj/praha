@@ -4,13 +4,24 @@ $color-bg: #d3cce3;
 $color-border: #555;
 $color-font: #333;
 
+.board {
+  min-height: 100vh;
+  font-family: "Mali", cursive;
+  color: $color-font;
+  background: rgba($color-bg, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 
 .grids {
   display: flex;
   flex-wrap: wrap;
-  width: 300px;
+  width: 315px;
   height: 300px;
+  margin: 0 auto;
+
   & > * {
     width: 100px;
     height: 100px;
@@ -47,18 +58,5 @@ $color-font: #333;
 .info {
   text-align: center;
 
-  button {
-    padding: 8px 16px;
-    border: 1.5px solid $color-border;
-    border-radius: 100px;
-    background-color: transparent;
 
-    transition: 0.3s;
-    cursor: pointer;
-
-    &:hover {
-      background-color: $color-border;
-      color: white;
-    }
-  }
 }
