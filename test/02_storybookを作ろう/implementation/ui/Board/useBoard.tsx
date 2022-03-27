@@ -14,7 +14,8 @@ export type UseBoardResult = [
   player: string,
   boards: any[],
   handlePlayClick:(index: number) => void,
-  handleResetClick: () => void
+  handleResetClick: () => void,
+  renderStatus: () => JSX.Element
 ];
 
 export const useBoard = ({ initialValues, initialPlayer, initialWinner }: UseBoardProps):UseBoardResult => {
@@ -69,15 +70,17 @@ export const useBoard = ({ initialValues, initialPlayer, initialWinner }: UseBoa
     return (
       <h3>
         Player: {player}
-        { winner && ` | Winner: ${winner}` }
-    </h3>
+        { winner && `| Winner: ${winner}` }
+      </h3>
     )
-  };
+  }
+
   return [
     winner,
     player,
     boards,
     handlePlayClick,
-    handleResetClick
+    handleResetClick,
+    renderStatus
   ]
 }

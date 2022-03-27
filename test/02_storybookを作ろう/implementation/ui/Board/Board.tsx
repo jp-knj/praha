@@ -1,44 +1,31 @@
-import { Player } from "../../models/Player";
-import Button from "../../ui/Button";
-import Square from "../../ui/Square";
-import "../../styles/board.module.scss";
+import Button from "../../ui/Button/Button";
+import Square from "../../ui/Square/Square";
+import styles from "../../styles/board.module.scss";
 import { useBoard } from './useBoard';
 
 export const Board = () => {
   const initialValues = Array(9).fill(null);
   const initialPlayer = 'O';
   const initialWinner = '';
-  const [winner, player, boards, handlePlayClick, handleResetClick ] = useBoard({initialValues, initialPlayer, initialWinner});
-  console.log(boards);
+  const [winner, player, boards, handlePlayClick, handleResetClick, renderStatus ] = useBoard({initialValues, initialPlayer, initialWinner});
+
   return (
     <div>
-      <div className="grids">
+      <div className={styles.grids}>
         {
-          boards.map((value, index) => (
-            <div
-              role="button"
-              tabIndex={0}
+          boards.map((marker, index) => (
+            <Square
               key={index}
-              onClick={() => handlePlayClick(index)}
-              onKeyPress={() => handlePlayClick(index)}
-            >
-              {value}
-            </div>
+              index={index}
+              onClick={handlePlayClick}
+              marker={marker}
+            />
           ))
         }
-      </div>z
-      <div className="info">
-        <h3>
-          Player: {player}
-          { winner && ` | Winner: ${winner}` }
-        </h3>
-
-        <button
-          type="button"
-          onClick={handleResetClick}
-        >
-          Reset
-        </button>
+      </div>
+      <div className={styles.info}>
+        {renderStatus()}
+        <Button onClick={handleResetClick}/>
       </div>
     </div>
   );
