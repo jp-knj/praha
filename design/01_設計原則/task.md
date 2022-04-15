@@ -54,41 +54,41 @@ Personクラスの名前と勤務開始日（name, starWorkingAt）は外部か�
 - モジュール内の要素同士の関連度を示す座標
 凝集度の高いモジュールを分割しようとしても、結合度が増えて可読性が低下
 
-<summary>
-    <detail>機能的凝集/Functional Cohesion</detail>
+<details>
+    <summary>機能的凝集/Functional Cohesion</summary>
     関連する要素だけでもモジュールが構成され、モジュールが機能するために必要不可欠なものがすべて含まれている
-</summary>
+</details>
 
-<summary>
-    <detail>逐次的凝集/Sequential Cohesion</detail>
+<details>
+    <summary>逐次的凝集/Sequential Cohesion</summary>
     一方が出力したデータを、もう一方が入力とする形で、２つのモジュールが相互に作用している。
-</summary>
+</details>
 
-<summary>
-    <detail>通信的凝集度/Communicational Cohesion</detail>
+<details>
+    <summary>通信的凝集度/Communicational Cohesion</summary>
     ２つのモジュールが通信の連鎖を形成し、それぞれの情報を操作したり、何らかの出力に貢献したりする。たとえば、データベースにレコードを追加し、その情報に基づいて電子メールを生成するといった具合
-</summary>
+</details>
 
-<summary>
-    <detail>手続き型凝集度/Procedural Cohesion</detail>
+<details>
+    <summary>手続き型凝集度/Procedural Cohesion</summary>
     ２つのモジュールが通信の連鎖を形成し、それぞれの情報を操作したり、何らかの出力に貢献したりする。たとえば、データベースにレコードを追加し、その情報に基づいて電子メールを生成するといった具合
-</summary>
+</details>
 
-<summary>
-    <detail>時間的凝集度/Temporal Cohesion</detail>
+<details>
+    <summary>時間的凝集度/Temporal Cohesion</summary>
     モジュール間に時間的な依存関係がある、たとえば、多くのシステムにはシステム起動時に初期化しなければならない一見無関係な処理群が存在している。これらの異なる処理には時間的な凝集があるといえる。
-</summary>
+</details>
 
-<summary>
-    <detail>論理的凝集度/Logical Cohesion</detail>
+<details>
+    <summary>論理的凝集度/Logical Cohesion</summary>
     モジュール内のデータは論理的に関連しているものの、機能的には関連していない。たとえば、テキストやシリアライズされたオブジェクト、またはストリームを情報へ変換するモジュールを考える。
     この場合、これらは操作の上では関連があるものの、機能は全く異なる。
-</summary>
+</details>
 
-<summary>
-    <detail>偶発的凝集度/Coincidental Cohesion</detail>
+<details>
+    <summary>偶発的凝集度/Coincidental Cohesion</summary>
     モジュール内の要素は同じソースファイル内にある以外には関連性がない。これは最悪な形での凝集を表している。
-</summary>
+</details>
 
 #### 結合度
 - 求心性結合
