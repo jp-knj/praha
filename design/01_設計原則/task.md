@@ -28,7 +28,7 @@ Robert C. Martin氏がクラシックの著作Clean Codeで強調していたよ
 
 #### インタフェース分離の原則 / Interface Segregation Principle
 インターフェイスを作る際に、できるだけ小さくした方（メソッドを少なくないし1つのみ）が良い。
-- 再利用の向上、
+- 再利用の向上
 - 高い凝集度
 
 メソッドの間の関連度に関わるが、メソッドが多いインターフェースになると、仮に継承先が全てのメソッドを使わなくても、実装しなければなりません。
@@ -143,36 +143,89 @@ DIPは抽象に依存することで、
 依存性逆転の原則を適用せずにそのままモジュールを使用するような形にしてしまった場合、テストをするときに毎回データベースを立ち上げて接続して、という操作をせねばならず、テストを書くのが大変になる & テストの実行が遅くなります。
 テストのときはモックのデータベースを使うように工夫すれば、データベースの立ち上げも接続も不要で、テストが書ける。
 
-### デメトルの法則とは何でしょうか？
-デメテルの法則の原則は、モジュールが操作するオブジェクトの内部の詳細に関する知識を持たない。  
-
-ソフトウェアコンポーネントまたはオブジェクトは、他のオブジェクトまたはコンポーネントの内部動作に関する知識を持たない。
-
-3つのクラス（A、B、C）と、これらのクラスのオブジェクト（objA、objB、objC）について考えてみます。  
-ここで、objAがobjBに依存し、objBがobjCを構成する。
-このシーンでは、objAはobjBのメソッドとプロパティを呼び出すことができますが、objCは呼び出すことができません。
-
-デメテルの法則の原則は、カプセル化を利用してこの分離を実現し、アプリケーションのコンポーネント間の結合を減らす。
-コードの品質を向上させ、柔軟性とコードのメンテナンスを容易にするのに役立つ。
+### デメテルの法則とは何でしょうか？
+コードの結合度を最小化すること。
+- 不要な情報は他のモジュールに公開しない。
+- 他のモジュールの実装を当てしない。
 
 #### 以下のコードの保守性に対して効果が無いことを説明してあげてください
 [新人1年性が提出したサンプルコード](https://bit.ly/38AXxZN)
 
+`public宣言`されているため、誰でも照会し、更新できるフィールドを保持したコンテナになっている。
+提出されたコードでは、どこかのコードでフィールドを変更されているかもしれないため、保守しづらい
+
+<details>
+    <summary>Tell, Don't Askとは？</summary>
+    オブジェクトの内部状態に基づく意思決定をし、その結果で該当オブジェクトを更新してはならない。
+
+    問題を認識するための単なるパターンになる。
+</details>
+
 ## 課題２
-えば以下のサンプルコードでは「特定の商品は1人につき年間1つまでしか買えない」といった仕様を実現しようとしています
-TypeScript playgroundのサンプルコード
-このコードにはどのような問題点が潜んでいるでしょうか？もしあなたが書き換えるとしたら、どのようにこのコードを改修しますか？
-Food for thought:
-「アプリケーション側ではなくSQLで絞り込む」という改修を思い当たるかもしれません
-しかしその場合「過去1年以内に特定の商品を購入した履歴を抽出する」という、特定のドメインロジックに依存したSQLが生まれてしまいます。今後「過去3ヶ月以内に商品を購入した場合は購入不可とする」「プレミアム会員の場合は1年に何個でも購入可能とする」といったロジックが生まれると、それらのロジックがSQLに含まれて、SQLがどんどん複雑に肥大化していきます
-一方、アプリケーション側だけで絞り込みを実現しようとすると（今回のように、まず特定ユーザーの過去の購入履歴を全て取得してから絞り込むといったアプローチだと）性能面で問題が起きるかもしれません
-どちらの方法もメリットデメリットがありそうですね・・・！（実際そういう問題なので答えはケースバイケースなのですが、どんな時にどちらの選択肢を選ぶか考えてみると面白いかもしれません）
+`purchase関数`から下記の関数を外部へ移動する
+```typescript
+const allPurchases = this.paymentRecordRepo.getPurchasesBy(userId)
+const pastPurchase = allPurchases.find((p) => p.productId === productId && p.transaction.succeeded)
+```
+```typescript
+interface Purchase {
+  userId: string
+  productId: string
+  transaction: {
+    succeeded: true
+    completedAt: Date
+  }
+}
+
+interface PaymentRecordRepo {
+  getPurchasesBy: (userId: string) => Purchase[]
+}
+
+const assertIsPurchased: <Purchase>(val: Purchase) => asserts val is NonNullable<Purchase> = val => {
+  if (val === undefined || val === null) {
+    throw new Error('この商品はおひとりさま一品限定です！')
+  }
+}
+
+class PurchaseService {
+  public constructor(private paymentRecordRepo: PaymentRecordRepo) {}
+  public getPurchaseHistories(userId: string){
+    return this.paymentRecordRepo.getPurchasesBy(userId)
+  }
+  public hasPastPurchase(listOfPurchaseHistories: Purchase[], productId:string):Purchase {
+    const result = listOfPurchaseHistories.find((p) => p.productId === productId && p.transaction.succeeded)
+    assertIsPurchased(result)
+    return result
+  }
+  public purchase() {
+    // 購入手続きに進む
+  }
+}
+
+```
+**Playground**  
+[修正後のコーディング](https://bit.ly/3JLj3rG)
+
 ## 課題３
-こちらのコードに記載されているようなPersonクラスとCompanyクラスが存在するとします
-Personクラスの名前と勤務開始日（name, starWorkingAt）は外部から自由に書き換えられるような状態になっています
-この設計にはどのような問題が潜んでいるでしょうか？
-どうすれば解決できると思いますか？
-ヒント：カプセル化について調べてみると良いかもしれません
+- フィールド変数を「private」にして隠す。（他のクラスから利用できないようにする）
+- 読み取り専用に書き換える
+
+### カプセル化のメリット・デメリット
+#### メリット
+- private修飾子を利用して外部からの、直接アクセスでメンバ変数の変更を防ぐことができる。
+- 専用のアクセサメソッドを利用することで、外部からの間違ったアクセスを未然に防ぐことができる。
+- 使用者が内部構造を理解していなくても使用できる。
+#### デメリット
+- ソースコードの記述量が増える。
+- 内部構造を知っていないと修正が難しくなる。
+
+<details>
+    <summary>カプセル化とは？</summary>
+オブジェクト指向プログラミングにおいて、互いに関連するデータの集合とそれらに対する操作をオブジェクトとして一つの単位にまとめ、外部に対して必要な情報や手続きのみを提供すること。 外から直に参照や操作をする必要のない内部の状態や構造は秘匿。  
+
+**参考文献**
+[カプセル化について](https://bit.ly/3Oev7VV)
+</details>
 
 ### 任意課題
 アーキテクトがモジュール性を把握するのに役立つキーとなる考え方に焦点を当てる。
