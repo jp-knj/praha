@@ -106,7 +106,7 @@
 - 名前
 
 ### 「Human」エンティティの値オブジェクトを作成
-/human/ValueObjects/BloodType.ts
+`/human/ValueObjects/BloodType.ts`
 ```typescript
 export interface BloodTypeProps {
     value: string;
@@ -133,7 +133,7 @@ export class BloodType extends ValueObject<BloodTypeProps> {
   }
 }
 ```
-/human/ValueObjects/BirthDate.ts
+`/human/ValueObjects/BirthDate.ts`
 ```typescript
 interface BirthDate {
     year: number;
@@ -163,5 +163,34 @@ export class BirthDate extends ValueObject<BirthDateProps> {
       }
         return Result.success(new BirthDate({ value: date }));
     }
+}
+```
+`/human/ValueObjects/Name.ts`
+```typescript
+export interface NameProps {
+    value: string;
+}
+
+export class Name extends ValueObject<NameProps> {
+  get value(): string {
+    return this.props.value;
+  }
+
+  private constructor(props: NameProps) {
+    super(props);
+  }
+
+  private static isValid(value: string): boolean {
+    return value.length <= 20;
+  }
+
+  public static create(name: string): Result<UserName> {
+    if (!this.isValidName(name)) {
+      return Result.fail<UserName>(`Invalid Argument - userName:[${name}]`)
+    }
+    return Result.ok<UserName>(
+      new UserName({ value: name })
+    )
+  }
 }
 ```
