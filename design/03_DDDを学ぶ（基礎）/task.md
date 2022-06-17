@@ -104,3 +104,32 @@
 - 血液型
 - 生年月日
 - 名前
+
+### 「Human」エンティティの値オブジェクトを作成
+```typescript
+export interface BloodTypeProps {
+    value: string;
+}
+
+export class BloodType extends ValueObject<BloodTypeProps> {
+  get value(): string {
+    return this.props.value;
+  }
+  
+  private constructor(props: BloodTypeProps) {
+    super(props);
+  }
+  
+  private static isValid(value: string): boolean {
+    return value === 'A' || value === 'B' || value === 'AB' || value === 'O';
+  }
+  
+  private static create(value: string): BloodType {
+    if (!BloodType.isValid(value)) {
+      throw new Error(`Invalid BloodType: ${value}`);
+    }
+    return new BloodType({ value });
+  }
+}
+
+```
