@@ -80,6 +80,7 @@
 
 <details>
     <summary>DTOとは？</summary>
+    <p>DTO(Data Transfer Object: データ転送オブジェクト) とは、複数の集約データを取得して詰め替えた値を持つ入れ物のこと</p>
 </details>
 
 ## 課題２
@@ -194,3 +195,8 @@ export class Name extends ValueObject<NameProps> {
   }
 }
 ```
+
+### DDDに関するクイズ
+- 集約の境界づけの決め方は、どのような点を考慮したほうが良いのでしょうか
+- ユビキタス言語の管理方法はどのように保守されるものでしょうか
+- ドメインモデル貧血症とは何でしょうか
