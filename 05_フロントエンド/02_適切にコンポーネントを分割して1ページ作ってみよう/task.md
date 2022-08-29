@@ -37,3 +37,24 @@ Atomic Design はアメリカの Web デザイナーである Brad Frost 氏が�
 - Templatesにデータを注入したもの
 
 ### React における関数コンポーネントとクラスコンポーネントの相違を説明する
+NOT YET
+
+## 課題2
+### 「position: absoluteは絶対に使わないように」と言われました。なぜでしょうか？
+> positioned layout, designed for very explicit positioning without much regard for other elements in the document
+
+他の要素を考慮せず、明確な position を指定できる。使用できる状態が珍しいため、再利用性が著しく低い。
+
+**参考**  
+[flexbox](https://www.w3.org/TR/css-flexbox-1/#intro)
+### 「可能な限りflexboxを使うように」とも指示されたので、基本的にレイアウトはflexboxで作ってみましょう
+> In return it gains simple and powerful tools for distributing space and aligning content in ways that web apps and complex web pages often need. The contents of a flex container
+
+Webアプリケーションや複雑なWebページが必要とする、スペース管理やコンテンツの配置を行うための simple で便利な layout mode なため。
+
+**参考**  
+[css-flexbox](https://www.w3.org/TR/css-flexbox-1/#overvie)
+## 課題3
+### より大きく複雑なサービスの開発にatomic designを取り入れた際に起きうる問題点をいくつか挙げてください
+
+### アトミックデザインに代わるディレクトリ構造を考えてみてください
