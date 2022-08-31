@@ -37,7 +37,88 @@ Atomic Design はアメリカの Web デザイナーである Brad Frost 氏が�
 - Templatesにデータを注入したもの
 
 ### React における関数コンポーネントとクラスコンポーネントの相違を説明する
-NOT YET
+#### 構文の違い
+- 関数コンポーネントはJSXを返すシンプルなJavaScript関数
+```typescript
+import React from "react";
+
+function FunctionalComponent() {
+ return <h1>Hello, world</h1>;
+}
+```
+
+- `React.Component`を拡張するJavaScript class
+```typescript
+import React, { Component } from "react";
+
+class ClassComponent extends Component {
+ render() {
+   return <h1>Hello, world</h1>;
+ }
+}
+```
+
+#### propsの受け渡し
+```typescript
+// 関数コンポーネント
+const FunctionalComponent = (props) => {
+ return <h1>Hello, {props.name}</h1>;
+};
+```
+
+```typescript
+// クラスコンポーネント 
+class ClassComponent extends React.Component {
+  render() {
+    const { name } = this.props;
+    return <h1>Hello, { name }</h1>;
+  }
+}
+```
+関数コンポーネントは引数として`props`を渡す。
+クラスは`this`を使用してpropsを参照する必要がある。
+
+#### stateの処理
+stateful関数コンポーネントで書ける。(現在の状態を表すデータなどを保持しており、その内容を処理に反映させる)
+```typescript
+const FunctionalComponent = () => {
+ const [count, setCount] = React.useState(0);
+
+ return (
+   <div>
+     <p>count: {count}</p>
+     <button onClick={() => setCount(count + 1)}>Click</button>
+   </div>
+ );
+};
+```
+
+クラスコンポーネントのstateを処理する場合、概念は同じですが、方法が少し異なります。まず、`React.Componentコンストラクタ`の重要性を理解する必要があります。
+
+基本的に、コンストラクタを実装して`super(props)`の呼び出しを実行しないと、使用したいすべての`state変数`を定義できません。このため、まずコンストラクタを定義しましょう。コンストラクタ内では、`stateキー`と初期値を使用してstateオブジェクトを作成。JSX内て、`this.state.count`を使用してコンストラクタで定義した`stateキー`の値にアクセスし、カウントを表示。
+```typescript
+class ClassComponent extends React.Component {
+ constructor(props) {
+   super(props);
+   this.state = {
+     count: 0
+   };
+ }
+
+ render() {
+   return (
+     <div>
+       <p>count: {this.state.count} times</p>
+       <button onClick={() => this.setState({ count: this.state.count + 1 })}>
+         Click
+       </button>
+     </div>
+   );
+ }
+```
+
+総じて、関数コンポーネントの記述は短くシンプル。
+そのため、開発や可読性、テストがしやすくなります。クラスコンポーネントでは`this`が多用されるため混乱が生じやすくなります。
 
 ## 課題2
 ### 「position: absoluteは絶対に使わないように」と言われました。なぜでしょうか？
@@ -56,5 +137,29 @@ Webアプリケーションや複雑なWebページが必要とする、スペ�
 [css-flexbox](https://www.w3.org/TR/css-flexbox-1/#overvie)
 ## 課題3
 ### より大きく複雑なサービスの開発にatomic designを取り入れた際に起きうる問題点をいくつか挙げてください
+関わるメンバー全員で認識合わせや基準を明確にできないこと。Atomic Designの知識を有していても、コンポーネントの各ディレクトリの役割を明文化するのには長い期間と労力が必要になる。
+ビジュアルデザイナーとの連携を踏まえた実装や概念や設計が破綻しないように部品を考える必要がある
 
-### アトミックデザインに代わるディレクトリ構造を考えてみてください
+### Atomic Designに代わるディレクトリ構造を考えてみてください
+シンプルで保守しやすい方法でアプリケーションするために、機能を有するコードを `featuresフォルダ`内に保持する。
+`featuresフォルダ`には、その機能に特化したコードを格納。こうすることで、単一な機能に保ち、その宣言が共有のものと混在しないようになる。
+これは、多くのファイルを含むフラットなフォルダー構造よりもはるかに保守しやすくなります。
+
+```shell
+src
+|
++-- assets            # assets folder can contain all the static files such as images, fonts, etc.
++-- components        # shared components used across the entire application
++-- config            # all the global configuration, env variables etc. get exported from here and used in the app
++-- features          # feature based modules
++-- hooks             # shared hooks used across the entire application
++-- lib               # re-exporting different libraries preconfigured for the application
++-- providers         # all of the application providers
++-- routes            # routes configuration
++-- stores            # global state stores
++-- test              # test utilities and mock server
++-- types             # base types used across the application
++-- utils             # shared utility functions
+```
+
+[project structure](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md)
