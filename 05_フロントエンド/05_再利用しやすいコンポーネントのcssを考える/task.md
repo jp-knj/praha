@@ -61,3 +61,36 @@ export default function App() {
   );
 }
 ```
+## 課題2
+なぜこのようなcssの書き方をすると再利用しづらいコンポーネントになってしまうのでしょうか？  
+[問題のあるCSSの書き方](https://codesandbox.io/s/great-margulis-ir96j?file=/src/App.js)
+
+要素やコンポーネントはそれぞれ独立したものと考える。設計の時点では、周囲が別のコンテンツにとりかこまれるかどうかも、そのコンテンツがどんな性質なのかも決まってないため、親と子の関係性を定めたくはない。
+
+```css
+.with-sidebar {
+ display: flex;
+ flex-wrap: wrap;
+ // sidebar と　mainの隙間幅（ガター）
+ gap: var(--gutter, var(--s1))
+}
+.with-sidebar > :first-child {
+ // サイドバーがサイドバー足りうる幅
+ flex-basis: 20rem;
+ flex-grow: 1;   
+}
+.with-sidebar > :last-child {
+ // 0から伸長
+ flex-basis: 0;
+ flex-grow: 999;
+ //　要素の幅が等しくなったときに折り返す
+ min-width: 50%;   
+}
+```
+
+```html
+<div class="with-sidebar">
+  <div>サイドバー</div>
+  <div>サイドバーじゃない</div>
+</div>
+```
