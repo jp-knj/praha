@@ -32,7 +32,7 @@ export default function App() {
 この宣言では、文脈を考慮できてらず、margin設定が適切なものになるかどうかは場合による。
 親要素に`padding`を設定している場合、その内側では重複した`margin`と親要素の`padding`が足された空白が発生する。
 
-このコンポーネントをより再利用しやすいようcssを書き直してみてください
+より再利用しやすいようcssを書き直した。
 ```css
 .reusable-button {
   color: red;
@@ -67,6 +67,7 @@ export default function App() {
 
 要素やコンポーネントはそれぞれ独立したものと考える。設計の時点では、周囲が別のコンテンツにとりかこまれるかどうかも、そのコンテンツがどんな性質なのかも決まってないため、親と子の関係性を定めたくはない。
 
+より再利用しやすいようcssを書き直した。
 ```css
 .with-sidebar {
  display: flex;
@@ -93,4 +94,24 @@ export default function App() {
   <div>サイドバー</div>
   <div>サイドバーじゃない</div>
 </div>
+```
+
+## 課題3
+このコンポーネントのコンポーネント設計に潜んでいる問題を一つ教えてください。なぜこのような書き方をすると再利用しづらいコンポーネントになってしまうのでしょうか？
+[問題のあるHTML構造](https://codesandbox.io/s/epic-nash-2vbw4?file=/src/App.js)  
+再利用しづらい理由は
+- 親要素も呼び出される子要素（li）も、そのコンポーネントがどのように作られているかを気にする必要があること。
+- 呼び出される親要素が条件に合っていなければ使いまわせないこと。（今回の場合は、`menu`,`ol`,`ul`に含まれていなければならない）
+[liについて](https://html.spec.whatwg.org/multipage/grouping-content.html#the-li-element)
+
+## 課題4
+なぜこのような書き方をすると再利用しづらいコンポーネントになってしまうのでしょうか？  
+[問題のあるpropsの渡し方](https://codesandbox.io/s/aged-glade-6grnuk)
+
+`CustomBlueButton`は`CustomButton`の`UI`を継承しているため、`CustomButton`の影響を受ける。
+
+以下のようなpropsにすると、さらに汎用的なコンポーネントになる。
+```javascript
+borderBottom: 'mainColor' | 'subColor' | 'none'
+color: 'red' | 'blue' | 'yellow'
 ```
