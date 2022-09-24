@@ -60,3 +60,11 @@ Uncontrolled Componentsのメリット :
 - ネイティブ実装に近づくため移植性が高い
 
 [controlled componentについて](https://ja.reactjs.org/docs/uncontrolled-components.html)
+
+
+## 課題4
+- useStateに関するクイズ
+  - Q1.useState を呼ぶと何が起きるのか？
+  - Q2.`state変数`は1つにすべきですか、複数使うべきですか
+    - `useSate()`を1回だけ呼んで、1つのオブジェクト内にすべての`state`を入れたくなるかもしれません
+  - Q3.useStateとuseReducerはどのような違いがあるでしょうか
