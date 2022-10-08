@@ -93,14 +93,14 @@ const Home: NextPage = () => {
   )
 }
 
-const SomeComponent = ({ current }:{current: number}) => (
+export const SomeComponent = ({ current }:{current: number}) => (
     <p>
       ここに、このコンポーネントがレンダリングされた回数を表示してみよう!
       {current}回
     </p>
 );
 
-const FetchComponent = () => {
+export const FetchComponent = () => {
   const { data, error } = useFetch(
     "https://api.github.com/repos/facebook/react",
     {}
@@ -114,7 +114,7 @@ const FetchComponent = () => {
   );
 };
 
-function useCounter(): UseCounterReturnType {
+export function useCounter(): UseCounterReturnType {
   const [count, setCount] = useState<number>(0);
   const handleCountClick = useCallback(() => {
     setCount((prev) => prev + 1);
@@ -124,7 +124,7 @@ function useCounter(): UseCounterReturnType {
 }
 
 
-function usePrevious(value: any): UsePreviousReturnType {
+export function usePrevious(value: any): UsePreviousReturnType {
   const [flag, setFlag] = useState<boolean>(false);
   // @deprecated
   const ref = useRef<number>(0);
