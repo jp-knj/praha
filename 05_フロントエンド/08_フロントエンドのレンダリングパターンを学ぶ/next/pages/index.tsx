@@ -4,6 +4,14 @@ import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from "react"
 import styles from '../styles/Home.module.css'
 
+type UseCounterReturnType = [
+  count: number, handleCountClick: () => void
+]
+
+type UsePreviousReturnType = {
+  current: number,
+  handleFlagClick: () => void
+}
 
 const Home: NextPage = () => {
   const [count, handleCountClick] = useCounter();
@@ -106,7 +114,7 @@ const FetchComponent = () => {
   );
 };
 
-function useCounter() {
+function useCounter(): UseCounterReturnType {
   const [count, setCount] = useState<number>(0);
   const handleCountClick = useCallback(() => {
     setCount((prev) => prev + 1);
@@ -116,9 +124,10 @@ function useCounter() {
 }
 
 
-function usePrevious(value: any) {
+function usePrevious(value: any): UsePreviousReturnType {
   const [flag, setFlag] = useState<boolean>(false);
-  const ref = useRef(0);
+  // @deprecated
+  const ref = useRef<number>(0);
 
   const handleFlagClick = useCallback(() => {
     setFlag((flag) => !flag);
