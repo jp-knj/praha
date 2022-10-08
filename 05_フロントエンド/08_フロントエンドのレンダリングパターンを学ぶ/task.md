@@ -151,3 +151,5 @@ SSR rehydrationを使用している実際のウェブサイトから収集し�
 
 ▼ 参考
 [レンダリング手法について](https://web.dev/rendering-on-the-web/)
+
+## 課題2
