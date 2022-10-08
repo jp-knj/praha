@@ -1,9 +1,18 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+import { useCallback, useEffect, useRef, useState } from "react"
 import styles from '../styles/Home.module.css'
 
+
 const Home: NextPage = () => {
+  const [count, handleCountClick] = useCounter();
+  const { current, handleFlagClick } = usePrevious(count);
+
+  const handleClick = useCallback(() => {
+    handleFlagClick();
+    handleCountClick();
+  }, [handleCountClick, handleFlagClick]);
   return (
     <div className={styles.container}>
       <Head>
@@ -65,8 +74,99 @@ const Home: NextPage = () => {
           </span>
         </a>
       </footer>
+
+      <h1>Hello CodeSandbox</h1>
+      <h2>Start editing to see some magic happen!</h2>
+      <button onClick={handleClick}>レンダリング！</button>
+      <SomeComponent  current={current} />
+      <FetchComponent />
+
     </div>
   )
 }
+
+const SomeComponent = ({ current }:{current: number}) => (
+    <p>
+      ここに、このコンポーネントがレンダリングされた回数を表示してみよう!
+      {current}回
+    </p>
+);
+
+const FetchComponent = () => {
+  const { data, error } = useFetch(
+    "https://api.github.com/repos/facebook/react",
+    {}
+  );
+
+  return (
+    <div>
+      <p>ここにReactのGitHubレポジトリに付いたスターの数を表示してみよう</p>
+      <p>{data.stars} stars</p>
+    </div>
+  );
+};
+
+function useCounter() {
+  const [count, setCount] = useState<number>(0);
+  const handleCountClick = useCallback(() => {
+    setCount((prev) => prev + 1);
+  }, []);
+
+  return [count, handleCountClick];
+}
+
+
+function usePrevious(value: any) {
+  const [flag, setFlag] = useState<boolean>(false);
+  const ref = useRef(0);
+
+  const handleFlagClick = useCallback(() => {
+    setFlag((flag) => !flag);
+  }, []);
+
+  useEffect(() => {
+    if (flag) {
+      return (ref.current = value);
+    }
+  }, [value, flag]);
+  return {
+    current: ref.current,
+    handleFlagClick: handleFlagClick
+  };
+}
+
+const useFetch = (url: string, options: {}) => {
+  const [data, setData] = useState({
+    subscribers: 0,
+    stars: 0
+  });
+
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    const fetchData = async () => {
+      try {
+        const res = await fetch(url, { ...options, signal });
+        const response = await res.json();
+        const { watchers, subscribers_count } = response;
+        setData({
+          subscribers: subscribers_count,
+          stars: watchers
+        });
+      } catch (error: any) {
+        setError(error);
+      }
+    };
+    fetchData();
+    return () => {
+      abortController.abort();
+    };
+  }, []);
+
+  return { data, error };
+};
 
 export default Home
