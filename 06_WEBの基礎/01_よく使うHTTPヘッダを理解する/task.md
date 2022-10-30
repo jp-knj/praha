@@ -68,3 +68,15 @@ Location と Content-Location は異なります。 Location ヘッダーは、�
 
 ▼ 参考
 https://web.dev/i18n/ja/external-anchors-use-rel-noopener/
+
+## 課題２（クイズ）
+- HTTPヘッダーに関するクイズを3問、作成してください
+
+
+## 課題３（クイズ）
+
+様々なHTTPメソッドがありますが（GET/POST/PUT/PATCH/FETCHなど）、実現したいユースケースに適したメソッドを選択するのは意外と（特に更新系）大変です。例えば以下のケースを考えてみてください：
+Twitterのフォロー関係の破棄はPUT?PATCH?DELETE?
+取引の取り消しはPUT?PATCH?DELETE?
+お気に入りリストからの削除はPUT?PATCH?DELETE?
+どこまでHTTPメソッドを本来の定義に沿って使うべきか、ペアと話し合ってみてください。参考としてSlackやTwitterなど有名サービスのAPIのドキュメントを読んでみると良いかもしれません！
