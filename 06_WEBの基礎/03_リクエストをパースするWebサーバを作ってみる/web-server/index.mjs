@@ -12,13 +12,18 @@ app.get("/",(_, response) => {
   response.status(200).json(data)
 })
 
-app.post("/", (request,response) =>{
-  if (request.headers["content-type"] === "application/json") {
-    response.status(201).json(request.body)
-  }
-  if(request.headers["content-type"] !== "application/json") {
-    response.status(400).send("400 Error: Use `application/json`")
+app.post("/", (request,response) => {
+  try {
+    if (request.headers["content-type"] !== "application/json") {
+      return response.status(400).send("400 Error: Use `application/json")
+    }
+    return response.status(201).json(request.body)
+  } catch (err) {
+    return response.status(500).json({
+      success: false,
+      error: err
+    });
   }
 })
 
-app.listen(PORT, () => console.log(`server start loclhost${PORT}`))
+app.listen(PORT, () => console.log(`server start localhost:${PORT}`))
