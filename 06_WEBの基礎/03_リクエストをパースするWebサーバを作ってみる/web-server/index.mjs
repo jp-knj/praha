@@ -6,10 +6,17 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/",(_, response) => {
-  const data = {
-    text: 'hello world'
+  try {
+    const data = {
+      text: 'hello world'
+    }
+    return response.status(200).json(data)
+  } catch (err) {
+    return response.status(500).json({
+      success: false,
+      error: err
+    });
   }
-  response.status(200).json(data)
 })
 
 app.post("/", (request,response) => {
