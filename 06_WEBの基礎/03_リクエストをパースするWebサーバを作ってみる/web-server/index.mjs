@@ -22,7 +22,7 @@ app.get("/",(_, response) => {
 app.post("/", (request,response) => {
   try {
     if (request.headers["content-type"] !== "application/json") {
-      return response.status(400).send("400 Error: Use `application/json")
+      return response.status(400).send("400 Error: Use application/json")
     }
     return response.status(201).json(request.body)
   } catch (err) {
