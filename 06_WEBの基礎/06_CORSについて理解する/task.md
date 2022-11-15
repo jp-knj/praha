@@ -7,6 +7,18 @@
 - simple request
 - access-control-allow-origin
 
+### CORSとは
+あるオリジンで動作しているウェブアプリケーションに、異なるオリジンに選択されたリソースへのアクセス権を与えるようブラウザーに指示するための仕組み
+
+#### オリジンとは
+オリジンとは、Webサイトにアクセスするために使われるURLの スキーム（プロトコル）、ホスト（ドメイン）、ポート によって定義されたもの。
+
+- URL:`http://example.com:8080/sample1/index.html`
+  - スキーム: `http` 
+  - ホスト: `example.com`
+  - ポート: `:8080`
+
+https://developer.mozilla.org/ja/docs/Glossary/Origin
 
 この設定が問題となるケースを1つ挙げて、なぜ設定するべきではないのか、説明してください
 `Access-Control-Allow-Origin: *`
