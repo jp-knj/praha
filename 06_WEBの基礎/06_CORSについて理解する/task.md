@@ -7,6 +7,32 @@
 - simple request
 - access-control-allow-origin
 
+CORSはあるHTTPヘッダーを使用してクライアントとサーバのやりとりを行います。
+- `Origin`
+- `Access-Controll-Request-http://example.com`
+
+**クライアントで CORS の許可がないとき**
+クライアントのサイトオリジンを `http://example.com` 
+サーバのサイトオリジンを`http://api.example.com`とする。
+
+1. クライアントは、クライアントのサイトオリジンへのリクエストを送り、リソースを取得するための JSファイル をダウンロードする
+2. JSファイル はリソースを取得するため、サーバのサイトオリジンに対し HTTPリクエスト を行う
+3. HTTPリクエストには、追加のHTTPヘッダとしてOrigin: http://example.comを付与する
+4. リクエストを受けたAPIサーバは、JSONなどのリソースをHTTPレスポンスとしてリクエスト元へ返却する
+5. HTTPレスポンスには、 `Access-Controll-Allow-http://example.com` が付与されていない 
+6. CORS は許可されていないこととなり、リクエスト元はリソースを取得することができない
+
+**クライアントで CORS の許可があるとき**
+クライアントのサイトオリジンを `http://example.com`
+サーバのサイトオリジンを`http://api.example.com`とする。
+
+- クライアントは、クライアントのサイトオリジンへのリクエストを送り、リソースを取得するための JSファイル をダウンロードする
+- JSファイルはリソースを取得するため、クライアントのサイトオリジンに対しHTTPリクエストを行う
+- HTTPリクエストには、追加のHTTPヘッダとして`Origin: http://example.com`を付与する
+- リクエストを受けたサーバのサイトオリジンは、 JSON などのリソースを HTTPレスポンス としてリクエスト元へ返却する
+- HTTPレスポンスに追加のHTTPヘッダとして`Access-Controll-Allow-http://example.com`を付与する
+- リクエスト元のオリジン`http://example.com`の CORS が許可されたため、リクエスト元はリソースを受け取ることができる
+
 ### CORSとは
 あるオリジンで動作しているウェブアプリケーションに、異なるオリジンに選択されたリソースへのアクセス権を与えるようブラウザーに指示するための仕組み
 
