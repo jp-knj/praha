@@ -33,6 +33,28 @@ CORSはあるHTTPヘッダーを使用してクライアントとサーバのや
 - HTTPレスポンスに追加のHTTPヘッダとして`Access-Controll-Allow-http://example.com`を付与する
 - リクエスト元のオリジン`http://example.com`の CORS が許可されたため、リクエスト元はリソースを受け取ることができる
 
+#### simple request について
+1. 許可されているメソッドのうちいずれかであること
+- GET, HEAD, POST
+2. 手動で設定できるリクエストヘッダは以下のいずれかであること（ユーザエージェントによって自動的に付与されるヘッダーを除く） 
+- Accept, Accept-Langage, Content-Langage, Content-Type
+  - Content-Typeヘッダは以下のいずれかであること 
+    - application/x-www-form-urlencoded, multipart/form-data, text/plain
+
+#### preflight request
+1. PUTリクエストでHTTPリクエストを送信 
+2. simple request ではないため、preflight request を送信
+3. preflight request は 
+  - `OPTIONS api/ HTTP1.1` 
+  - `Access-Control-Request-Method: PUT` 
+  - `Origin: http://example.jp` といったHTTPヘッダを追加してHTTPリクエストを飛ばす。このとき、実際の内容はまだ送られていない。
+4. preflight request が送られてきたサーバは、
+   `Access-Control-Allow-Method: PUT`
+   `Access-Control-Allow-Origin: http://example.com`
+   のように許可するHTTPメソッド・オリジンの情報を返却する。
+5. preflight request で許可が得られたため、PUTリクエストが送信される 
+6. simple requestの手順と同じ
+
 ### CORSとは
 あるオリジンで動作しているウェブアプリケーションに、異なるオリジンに選択されたリソースへのアクセス権を与えるようブラウザーに指示するための仕組み
 
