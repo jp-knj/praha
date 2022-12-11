@@ -215,3 +215,48 @@ generateSessionToken();
 </details>
 
 [SQL_injectionの解説動画](https://www.youtube.com/watch?v=5bj1pFmyyBA)
+
+### CSRF
+#### 攻撃手法
+- ダミーサイトを実装
+```html
+<form action="#" method="GET">
+  New password:<br />
+  <input type="password" AUTOCOMPLETE="off" name="password_new"><br />
+  Confirm new password:<br />
+  <input type="password" AUTOCOMPLETE="off" name="password_conf"><br />
+  <br />
+  <input type="submit" value="Change" name="Change">
+</form>
+```
+- form-action を変更して、リクエストを送信
+#### 有効な防御手段
+- csrf の token を form に含める 
+- cookie属性 に SameSite を Lax や Strict に設定
+
+[CSRFトークン](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
+
+### XSS
+#### 攻撃手法
+- cookieを表示
+```html
+><script>window.alert(document.cookie)</script>
+
+PHPSESSID=s391ihbvkbm74il0ghcgjkbvb4; security=low
+```
+#### 有効な防御手段
+- `mysql_real_escape_string` を使用する
+  - すべての (') の前に (/)が追加
+
+## 課題4
+OWASPが提供している[OWASP Top Ten](https://cheatsheetseries.owasp.org/IndexTopTen.html)に目を通してください。WEBサービスの代表的かつ深刻な脆弱性がリストアップされています。この中から脆弱性を1つを選び、あなたが現在開発しているサービスがその脆弱性に対処できていると思うか考えてみてください。
+
+#### Broken Access Control について
+アクセス制御が機能しないときに起こる脆弱性のことです。アクセス制御は、特定のユーザーやプログラムが特定のリソースにアクセスすることを許可するものですが、この脆弱性が発生すると、不正なユーザーやプログラムが特定のリソースにアクセスできてしまいます。このような脆弱性を攻撃されると、セキュリティ上の問題が発生してしまうため、適切な対策が必要です。
+
+#### Broken Access Controlという脆弱性に対しては、次のような対策が考えられます。
+アクセス制御を厳格に行う。不正なアクセスを防ぎ、セキュリティを確保するために、アクセス制御を厳格に行うことが重要です。例えば、特定のユーザーやプログラムに対して、特定のリソースへのアクセス権限を与えるなどの対策が考えられます。
+
+パスワードを安全に管理する。パスワードは、ユーザーのアカウントを保護するための重要なツールです。そのため、パスワードを安全に管理することが重要です。例えば、複雑なパスワードを設定するようにすることで、不正なアクセスを防ぐことができます。また、パスワードを定期的に変更することも有効です。
+
+適切な対応を行う。セキュリティ上の問題が発生した場合には、すぐに適切な対応を行うことが重要です。例えば、不正なアクセスが行われた場合には、すぐにアクセス権限を変更したり、セキュリティ対策を強化したりするなどの対応を行うことが必要です。また、問題が発生したことを管理者や関係者に通知し、速やかに対応することも大切です。
